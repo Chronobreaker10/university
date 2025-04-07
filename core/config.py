@@ -1,0 +1,21 @@
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+class Settings(BaseSettings):
+    SECRET_KEY: str = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    DB_USER: str = "postgres"
+    DB_PASS: str = "postgres"
+    DB_HOST: str = "localhost"
+    DB_PORT: int = 5433
+    DB_NAME: str = "habr"
+    TEST_DATABASE_URL: str = "sqlite+aiosqlite://"
+    model_config = SettingsConfigDict(env_file=".env")
+
+    @property
+    def DATABASE_URL(self):
+        return f"postgresql+asyncpg://{self.DB_USER}:{self.DB_PASS}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
+
+
+settings = Settings()
