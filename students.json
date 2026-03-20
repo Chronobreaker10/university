@@ -128,5 +128,19 @@
         "major": "\u042d\u043a\u043e\u043b\u043e\u0433\u0438\u044f",
         "course": 3,
         "special_notes": "\u0411\u0435\u0437 \u043e\u0441\u043e\u0431\u044b\u0445 \u043f\u0440\u0438\u043c\u0435\u0442"
+    },
+    {
+        "phone_number": "+7-919-123-32-65",
+        "first_name": "Ivan",
+        "last_name": "Petrov",
+        "date_of_birth": "2001-03-19",
+        "email": "ivan@example.com",
+        "address": "secret location",
+        "enrollment_year": 2010,
+        "major_id": 0,
+        "course": 1,
+        "special_notes": "",
+        "id": 30,
+        "major_name": "\u0418\u043d\u0444\u043e\u0440\u043c\u0430\u0442\u0438\u043a\u0430"
     }
 ]

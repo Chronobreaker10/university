@@ -4,11 +4,11 @@ from typing import Sequence
 
 from json_db_lite import JSONDatabase
 from sqlalchemy import select
-from sqlalchemy.orm import joinedload
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
 
 from core.models import Student
-from core.schemas import StudentRead, StudentCreate
+from core.schemas import StudentCreate
 
 db = JSONDatabase('students.json')
 

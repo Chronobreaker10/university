@@ -1,6 +1,7 @@
 services:
   postgres:
     image: postgres:latest
+    container_name: university_postgres
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -30,7 +31,7 @@ services:
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d habr"]
       interval: 30s
-      timeout: 5s
+      timeout: 10s
       retries: 5
     restart: unless-stopped
     tty: true

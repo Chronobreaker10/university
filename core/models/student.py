@@ -1,11 +1,12 @@
 from __future__ import annotations
 
+from datetime import date
 from typing import TYPE_CHECKING
 
+from sqlalchemy import String, Text, Integer, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import String, Text, Integer, text, ForeignKey
+
 from core.database import Base, int_pk, str_uniq
-from datetime import date
 
 if TYPE_CHECKING:
     from core.models import Major

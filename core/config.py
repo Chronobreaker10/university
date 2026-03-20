@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     DB_PASS: str = "postgres"
     DB_HOST: str = "localhost"
     DB_PORT: int = 5433
-    DB_NAME: str = "habr"
+    DB_NAME: str = "university"
     TEST_DATABASE_URL: str = "sqlite+aiosqlite://"
     model_config = SettingsConfigDict(env_file=".env")
 

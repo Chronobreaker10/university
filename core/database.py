@@ -1,25 +1,34 @@
+from __future__ import annotations
+
 from datetime import datetime
 from typing import Annotated
 
-from sqlalchemy import func
+from sqlalchemy import func, text
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncAttrs, AsyncSession
 from sqlalchemy.orm import DeclarativeBase, declared_attr, Mapped, mapped_column
-from fastapi import HTTPException, status
+
+from core.errors import DatabaseError
 from .config import settings
 
 engine = create_async_engine(settings.DATABASE_URL)
 async_session_maker = async_sessionmaker(engine, expire_on_commit=False)
 
 
-async def get_session() -> AsyncSession:
-    async with async_session_maker() as session:
-        try:
-            yield session
-            await session.commit()
-        except Exception as e:
-            await session.rollback()
-            print(e)
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="При работе с БД произошла ошибка")
+def get_session(isolation_level: str | None = None, commit: bool = True):
+    async def yield_session() -> AsyncSession:
+        async with async_session_maker() as session:
+            try:
+                if isolation_level:
+                    await session.execute(text(f"SET TRANSACTION ISOLATION LEVEL {isolation_level}"))
+                yield session
+                if commit:
+                    await session.commit()
+            except SQLAlchemyError as e:
+                await session.rollback()
+                print(e)
+                raise DatabaseError from e
+    return yield_session
 
 
 int_pk = Annotated[int, mapped_column(primary_key=True)]

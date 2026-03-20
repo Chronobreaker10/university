@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 from enum import Enum
-from pydantic import BaseModel, Field, EmailStr, field_validator, ValidationError, field_serializer, ConfigDict
+from pydantic import BaseModel, Field, EmailStr, field_validator, ValidationError, field_serializer, ConfigDict, \
+    TypeAdapter, computed_field
 from pydantic_extra_types.phone_numbers import PhoneNumber
-from typing import Annotated
+from typing import Annotated, TYPE_CHECKING
 from datetime import datetime, date
+from core.schemas.major import MajorRead
+
 
 
 class Major(str, Enum):
@@ -79,7 +82,28 @@ class StudentCreate(BaseModel):
 
 class StudentRead(StudentCreate):
     id: Annotated[int, Field(ge=1, le=1000, title="ID", description="ID")]
-    major_name: Annotated[
-        str,
-        Field(min_length=1, max_length=50, title="Специальность", description="Специальность студента, от 1 до 50 символов")
-    ]
+    # major_name: Annotated[
+    #     str,
+    #     Field(min_length=1, max_length=50, title="Специальность",
+    #           description="Специальность студента, от 1 до 50 символов")
+    # ]
+    major: Annotated[MajorRead, Field(exclude=True)]
+
+    @computed_field
+    @property
+    def major_name(self) -> str:
+        return self.major.major_name
+
+
+class StudentFilterParams(BaseModel):
+    course: Annotated[int | None, Field(ge=1, le=5, title="Курс", description="Курс")] = None
+    major: Annotated[str | None, Field(title="Специальность", description="Специальность")] = None
+    enrollment_year: Annotated[
+        int | None, Field(gt=2010, lt=2025, title="Год поступления", description="Год поступления")] = None
+
+
+class StudentFilter(BaseModel):
+    course: Annotated[int | None, Field(ge=1, le=5, title="Курс", description="Курс")] = None
+    major_id: Annotated[int | None, Field(title="Специальность", description="Специальность")] = None
+    enrollment_year: Annotated[
+        int | None, Field(gt=2010, lt=2025, title="Год поступления", description="Год поступления")] = None
