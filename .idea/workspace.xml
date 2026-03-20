@@ -5,33 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="39b46e51-b759-4258-967a-a2bf10619a63" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/api/services/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/api/services/major.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/api/services/student.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/api/views/major.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/dao/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/dao/base.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/dao/major.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/dao/student.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/errors.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/schemas/major.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/universityAPI.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/universityAPI.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/crud/students.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/crud/students.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/dependencies/student.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/dependencies/student.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/views/students.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/views/students.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/config.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/database.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/database.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/models/student.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/models/student.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/schemas/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/schemas/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/schemas/student.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/schemas/student.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/migration/versions/2025_01_24_1659-c72b403029d4_initial_revision.py" beforeDir="false" afterPath="$PROJECT_DIR$/migration/versions/2025_01_24_1659-c72b403029d4_initial_revision.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/students.json" beforeDir="false" afterPath="$PROJECT_DIR$/students.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/test.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
