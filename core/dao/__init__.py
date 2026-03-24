@@ -1,5 +1,5 @@
+__all__ = ["StudentDAO", "MajorDAO", "UserDAO"]
+
 from .student import StudentDAO
 from .major import MajorDAO
-
-
-__all__ = ['StudentDAO', MajorDAO]
+from .user import UserDAO

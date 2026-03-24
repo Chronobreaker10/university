@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="39b46e51-b759-4258-967a-a2bf10619a63" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.env.docker" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/api/dependencies/user.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/api/services/user.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/api/views/users.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core/dao/user.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core/models/annotations.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core/models/base.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core/models/user.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core/schemas/user.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core/security/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core/security/auth.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pages/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pages/auth.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pages/students.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/static/style.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/auth/login.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/auth/register.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/base.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/students/create.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/students/index.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/toast.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/utils/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/utils/case_converter.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/utils/json_converter.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.env" beforeDir="false" afterPath="$PROJECT_DIR$/.env" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/dependencies/student.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/dependencies/student.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/services/major.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/services/major.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/services/student.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/services/student.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/views/major.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/views/major.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/views/students.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/views/students.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/config.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/dao/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/dao/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/dao/base.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/dao/base.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/dao/student.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/dao/student.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/database.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/database.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/errors.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/errors.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/models/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/models/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/models/major.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/models/major.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/models/student.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/models/student.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/schemas/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/schemas/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/schemas/student.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/schemas/student.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/migration/env.py" beforeDir="false" afterPath="$PROJECT_DIR$/migration/env.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils.py" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="HTML File" />
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 5
+}</component>
+  <component name="ProjectId" id="2s1ebYxVJUCh82uZfTcLRMBA6Hi" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "DefaultHtmlFileTemplate": "HTML File",
+    "Docker.docker-compose.yml.postgres: Compose Deployment.executor": "Run",
+    "Docker.docker-compose.yml: Compose Deployment.executor": "Run",
+    "Python.main.executor": "Run",
+    "Python.test.executor": "Run",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "D:/PythonProjects/freedomtv",
+    "settings.editor.selected.configurable": "project.propVCSSupport.DirectoryMappings"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\PythonProjects\universityAPI\templates" />
+      <recent name="D:\PythonProjects\universityAPI\templates\students" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Python.main">
+    <configuration name="main" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+      <module name="universityAPI" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="test" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="universityAPI" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/test.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="docker-deploy" factoryName="docker-compose.yml" temporary="true">
+      <deployment type="docker-compose.yml">
+        <settings />
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <configuration name="docker-compose.yml: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
+      <deployment type="docker-compose.yml">
+        <settings>
+          <option name="envFilePath" value="" />
+          <option name="sourceFilePath" value="docker-compose.yml" />
+        </settings>
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <configuration name="docker-compose.yml.postgres: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
+      <deployment type="docker-compose.yml">
+        <settings>
+          <option name="services">
+            <list>
+              <option value="postgres" />
+            </list>
+          </option>
+          <option name="sourceFilePath" value="docker-compose.yml" />
+        </settings>
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Docker.docker-compose.yml.postgres: Compose Deployment" />
+        <item itemvalue="Docker.docker-compose.yml: Compose Deployment" />
+        <item itemvalue="Python.test" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-python-sdk-09665e90c3a7-d3b881c8e49f-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-233.15026.15" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="39b46e51-b759-4258-967a-a2bf10619a63" name="Changes" comment="" />
+      <created>1737627580502</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1737627580502</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <ignored-roots>
+      <path value="$PROJECT_DIR$/.." />
+    </ignored-roots>
+  </component>
+</project>

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Callable
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -8,7 +10,7 @@ from core.models import Major
 from core.errors import NotFoundError
 
 
-async def get_majors_by_filter(session: AsyncSession, major_filter: MajorFilter) -> list[Major]:
+async def get_majors_by_filter(session: AsyncSession, major_filter: MajorFilter | None) -> list[Major]:
     return await MajorDAO.find_by_filter(session, major_filter)
 
 

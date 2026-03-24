@@ -4,7 +4,7 @@ from typing import Annotated
 
 from fastapi import Query, Depends, Path
 from sqlalchemy.ext.asyncio import AsyncSession
-from core.database import get_session
+from core.database import db_helper
 from core.dao import StudentDAO
 
 
@@ -24,6 +24,6 @@ def query_params(course: Annotated[int | None, Query(ge=1, le=5, title="Курс
     }
 
 
-async def get_student_by_id(session: Annotated[AsyncSession, Depends(get_session())],
+async def get_student_by_id(session: Annotated[AsyncSession, Depends(db_helper.get_session())],
                             student_id: Annotated[int, Path(ge=1, le=1000, title="ID", description="ID")]):
     return await StudentDAO.get_one_by_id(session, student_id)

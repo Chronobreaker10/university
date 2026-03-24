@@ -3,10 +3,10 @@ from __future__ import annotations
 from typing import TypeVar, Generic, Sequence, Callable
 
 from pydantic import BaseModel
-from sqlalchemy import select, delete, update
+from sqlalchemy import select, delete, update, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from core.database import Base
+from core.models import Base
 
 T = TypeVar("T", bound=Base)
 
@@ -42,15 +42,12 @@ class BaseDAO(Generic[T]):
         return result.scalar_one_or_none()
 
     @classmethod
-    async def find_by_filter(cls, session: AsyncSession, filters: BaseModel) -> Sequence[T]:
-        filter_dict = filters.model_dump(exclude_unset=True)
-        query = select(cls.Model).filter_by(**filter_dict)
-        result = await session.execute(query)
-        return result.scalars().all()
-
-    @classmethod
-    async def get_all(cls, session: AsyncSession) -> Sequence[T]:
-        query = select(cls.Model)
+    async def find_by_filter(cls, session: AsyncSession, filters: BaseModel | None) -> Sequence[T]:
+        if filters is None:
+            query = select(cls.Model)
+        else:
+            filter_dict = filters.model_dump(exclude_unset=True)
+            query = select(cls.Model).filter_by(**filter_dict)
         result = await session.execute(query)
         return result.scalars().all()
 
@@ -64,7 +61,7 @@ class BaseDAO(Generic[T]):
     @classmethod
     async def update_by_filter(cls, session: AsyncSession, filters: BaseModel, data: BaseModel) -> Callable[[], int]:
         filter_dict = filters.model_dump(exclude_unset=True)
-        data_dict = data.model_dump(exclude_unset=True)
+        data_dict = data.model_dump(exclude_unset=True, exclude={"id"})
         stmt = update(cls.Model).filter_by(**filter_dict).values(**data_dict)
         result = await session.execute(stmt)
         await session.flush()
@@ -84,3 +81,13 @@ class BaseDAO(Generic[T]):
         result = await session.execute(stmt)
         await session.flush()
         return result.rowcount
+
+    @classmethod
+    async def get_count(cls, session: AsyncSession, filters: BaseModel | None) -> int:
+        if filters is None:
+            query = select(func.count(cls.Model.id))
+        else:
+            filter_dict = filters.model_dump(exclude_unset=True)
+            query = select(func.count(cls.Model.id)).filter_by(**filter_dict)
+        result = await session.execute(query)
+        return result.scalar()

@@ -1,0 +1,163 @@
+{% extends "base.html" %} {% block content %}
+{% include "toast.html" %}
+<body class="bg-gradient-to-br from-slate-50 to-blue-50 font-sans antialiased">
+<div class="max-w-[80%] mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+    <!-- Заголовок и краткая статистика -->
+    <div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+            <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight text-slate-800 inline-flex items-center gap-3">
+                <i class="fas fa-user-graduate text-indigo-500 text-3xl"></i>
+                Студенты
+            </h1>
+            <p class="text-slate-500 mt-1 text-sm md:text-base">Актуальный список учащихся</p>
+        </div>
+        <div class="flex gap-3">
+            <div class="bg-white rounded-xl shadow-sm px-4 py-2 flex items-center gap-2 border border-slate-200">
+                <i class="fas fa-users text-indigo-400"></i>
+                <span class="text-sm font-medium text-slate-600">Всего:</span>
+                <span class="text-xl font-bold text-slate-800" id="studentCount">{{ response.total_count }}</span>
+            </div>
+            <a href="{{ url_for('students.create') }}" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl shadow-md transition flex items-center gap-2 text-sm font-medium">
+                <i class="fas fa-plus-circle"></i> Добавить
+            </a>
+        </div>
+    </div>
+
+    <div class="mb-6 flex flex-col sm:flex-row gap-4 justify-between items-center">
+        <form class="relative w-full sm:w-96" id="searchForm" method="get" action="">
+            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+            <input type="text" id="searchInput" placeholder="Поиск по имени, телефону, email или адресу..."
+                   name="search"
+                   class="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-300 transition text-sm">
+        </form>
+        <div class="flex gap-2">
+            <form id="majorForm" method="get" action="">
+                <select id="courseFilter" name="major_id"
+                        class="bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm shadow-sm focus:ring-indigo-300">
+                    {% for major in response.majors %}
+                    {% if major.id|string == request.query_params.get('major_id') %}
+                    <option value="{{ major.id }}" selected>{{ major.major_name }}</option>
+                    {% else %}
+                    <option value="{{ major.id }}">{{ major.major_name }}</option>
+                    {% endif %}
+                    {% endfor %}
+                </select>
+                <button id="majorFilter"
+                        class="text-slate-500 hover:text-indigo-600 px-3 py-2 rounded-xl border border-slate-200 bg-white text-sm transition">
+                    <i class="fas fa-search"></i> Поиск
+                </button>
+            </form>
+            <form id="resetForm" method="get" action="">
+                <button id="resetFilter"
+                        class="text-slate-500 hover:text-indigo-600 px-3 py-2 rounded-xl border border-slate-200 bg-white text-sm transition">
+                    <i class="fas fa-undo-alt"></i> Сброс
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Контейнер с таблицей (горизонтальный скролл на мобильных) -->
+    <div class="table-wrapper overflow-x-auto bg-white rounded-2xl shadow-lg border border-slate-100">
+        <table class="student-table min-w-full text-sm text-left text-slate-700">
+            <thead class="bg-slate-50 text-xs uppercase font-semibold text-slate-500 border-b border-slate-200">
+            <tr>
+                <th scope="col" class="px-5 py-4 rounded-tl-xl">
+                    <div class="flex items-center gap-1">
+                        <i class="fas fa-id-card text-slate-400"></i> ID
+                    </div>
+                </th>
+                <th scope="col" class="px-5 py-4">
+                    <div class="flex items-center gap-1">
+                        <i class="fas fa-user text-slate-400"></i> ФИО
+                    </div>
+                </th>
+                <th scope="col" class="px-5 py-4">
+                    <div class="flex items-center gap-1">
+                        <i class="fas fa-phone text-slate-400"></i> Номер телефона
+                    </div>
+                </th>
+                <th scope="col" class="px-5 py-4">
+                    <div class="flex items-center gap-1">
+                        <i class="fas fa-envelope text-slate-400"></i> Email
+                    </div>
+                </th>
+                <th scope="col" class="px-5 py-4">
+                    <div class="flex items-center gap-1">
+                        <i class="fas fa-graduation-cap text-slate-400"></i> Курс
+                    </div>
+                </th>
+                <th scope="col" class="px-5 py-4">
+                    <div class="flex items-center gap-1">
+                        <i class="fas fa-calendar-alt text-slate-400"></i> Дата рождения
+                    </div>
+                </th>
+                <th scope="col" class="px-5 py-4">
+                    <div class="flex items-center gap-1">
+                        <i class="fas fa-university text-slate-400"></i> Факультет
+                    </div>
+                </th>
+                <th scope="col" class="px-5 py-4">
+                    <div class="flex items-center gap-1">
+                        Год поступления
+                    </div>
+                </th>
+                <th scope="col" class="px-5 py-4">
+                    <div class="flex items-center gap-1">
+                        <i class="fas fa-address-card text-slate-400"></i> Адрес
+                    </div>
+                </th>
+            </tr>
+            </thead>
+            <tbody id="studentTableBody">
+            {% for student in response.students %}
+            <tr class="border-b border-slate-100 hover:bg-slate-50 transition duration-150">
+                <td class="px-5 py-3 font-mono text-xs text-slate-500">#{{ student.id }}</td>
+                <td class="px-5 py-3 font-medium text-slate-800">{{ student.first_name }} {{ student.last_name }}</td>
+                <td class="px-5 py-3 text-slate-600 text-sm"><a href="tel:{{ student.phone_number.replace('-', '') }}"
+                                                                class="hover:text-indigo-600 underline decoration-dotted">{{
+                    student.phone_number }}</a></td>
+                <td class="px-5 py-3 text-slate-600 text-sm"><a href="mailto:{{ student.email }}"
+                                                                class="hover:text-indigo-600 underline decoration-dotted">{{
+                    student.email }}</a></td>
+                <td class="px-5 py-3"><span
+                        class="bg-slate-100 text-slate-700 text-xs px-2 py-1 rounded-lg font-medium">{{ student.course }}</span>
+                </td>
+                <td class="px-5 py-3 text-slate-500 text-sm whitespace-nowrap">{{
+                    student.date_of_birth.strftime('%d.%m.%Y') }}
+                </td>
+                <td class="px-5 py-3 text-slate-500 text-sm">{{ student.major.major_name }}</td>
+                <td class="px-5 py-3 text-slate-500 text-sm text-center">{{ student.enrollment_year }}</td>
+                <td class="px-5 py-3 text-slate-500 text-sm text-center">{{ student.address }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <!-- Сообщение, если нет результатов -->
+        <div id="noResultsMessage" class="hidden text-center py-10 text-slate-400 bg-white">
+            <i class="fas fa-user-slash text-4xl mb-2 opacity-50"></i>
+            <p class="text-md">Студенты не найдены. Попробуйте изменить фильтр.</p>
+        </div>
+    </div>
+
+    <!-- Footer с пагинацией (простая для демо) -->
+    <div class="mt-6 flex flex-wrap justify-between items-center gap-3 text-sm text-slate-500">
+        <div class="flex gap-2">
+            {% if response.prev_page_url %}
+            <a id="prevPageBtn" href="{{ response.prev_page_url or '#' }}"
+               class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-50 transition">
+                <i class="fas fa-chevron-left"></i> Назад
+            </a>
+            {% endif %}
+            <span id="pageIndicator"
+                  class="px-3 py-1.5 font-medium">Стр. {{ request.query_params.get('page') or '1' }}</span>
+            {% if response.next_page_url %}
+            <a id="nextPageBtn" href="{{ response.next_page_url or '#' }}"
+               class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-50 transition">
+                Вперед <i class="fas fa-chevron-right"></i>
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+</body>
+{% endblock %}

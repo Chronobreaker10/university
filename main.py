@@ -5,28 +5,38 @@ from random import randint
 from typing import Annotated
 
 import uvicorn
-from fastapi import FastAPI, Query, Path, HTTPException
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI, Query, Path, HTTPException, status, Request
+from fastapi.responses import JSONResponse, RedirectResponse
+from fastapi.staticfiles import StaticFiles
+from starlette.middleware.sessions import SessionMiddleware
+from fastapi.exceptions import RequestValidationError
 
 import api.crud.students as student_crud
 from api.views.students import router as students_router
 from api.views.major import router as major_router
-from core.errors import NotFoundError
+from api.views.users import router as user_router
+from pages import router as page_router
+from core.errors import BaseError, RedirectError
 from core.schemas import StudentRead, StudentUpdate, StudentFilterByID, StudentFilterParams
+from core.config import settings
 from utils import json_to_dict_list
 
 parent_dir = pathlib.Path(__file__).parent
 data_dir = parent_dir / 'students.json'
 
 app = FastAPI()
+app.add_middleware(SessionMiddleware, secret_key=settings.security.secret_key)
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 app.include_router(students_router)
 app.include_router(major_router)
+app.include_router(user_router)
+app.include_router(page_router)
 
 
 @app.get("/")
 def home_page():
-    return {"message": "Привет, Мир!"}
+    return {"message": "Привет, Мир!!!"}
 
 
 @app.get('/json/students', response_model=list[StudentRead])
@@ -96,13 +106,32 @@ async def delete_student(student_filter: StudentFilterByID):
         raise HTTPException(status_code=400, detail="Ошибка при удалении студента")
 
 
-@app.exception_handler(NotFoundError)
-async def not_found_exception_handler(request, exc: NotFoundError):
+@app.exception_handler(BaseError)
+async def not_found_exception_handler(request, exc: BaseError):
     return JSONResponse(
         status_code=exc.code,
         content={"message": exc.message}
     )
 
 
+@app.exception_handler(RedirectError)
+async def redirect_exception_handler(request: Request, exc: RedirectError):
+    request.session["flashed_message"] = {
+        "type": "error",
+        "text": exc.message
+    }
+    url = request.url_for(exc.redirect_to) if exc.redirect_to else request.url
+    return RedirectResponse(url=url, status_code=status.HTTP_303_SEE_OTHER)
+
+
+@app.exception_handler(RequestValidationError)
+async def redirect_exception_handler(request, exc: RequestValidationError):
+    request.session["flashed_message"] = {
+        "type": "error",
+        "text": "Проверьте правильность введенных данных!"
+    }
+    return RedirectResponse(url=request.url, status_code=status.HTTP_303_SEE_OTHER)
+
+
 if __name__ == '__main__':
-    uvicorn.run(app, host='127.0.0.1', port=8000, reload=True)
+    uvicorn.run(app, host='localhost', port=8001, reload=True)

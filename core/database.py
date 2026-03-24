@@ -1,49 +1,52 @@
 from __future__ import annotations
-
-from datetime import datetime
-from typing import Annotated
-
-from sqlalchemy import func, text
+import logging
+from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncAttrs, AsyncSession
-from sqlalchemy.orm import DeclarativeBase, declared_attr, Mapped, mapped_column
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession, AsyncEngine
 
 from core.errors import DatabaseError
 from .config import settings
 
-engine = create_async_engine(settings.DATABASE_URL)
-async_session_maker = async_sessionmaker(engine, expire_on_commit=False)
+log = logging.getLogger(__name__)
 
 
-def get_session(isolation_level: str | None = None, commit: bool = True):
-    async def yield_session() -> AsyncSession:
-        async with async_session_maker() as session:
-            try:
-                if isolation_level:
-                    await session.execute(text(f"SET TRANSACTION ISOLATION LEVEL {isolation_level}"))
-                yield session
-                if commit:
-                    await session.commit()
-            except SQLAlchemyError as e:
-                await session.rollback()
-                print(e)
-                raise DatabaseError from e
-    return yield_session
+class DatabaseHelper:
+
+    def __init__(self, url: str,
+                 echo: bool = False,
+                 echo_pool: bool = False,
+                 pool_size: int = 5,
+                 max_overflow: int = 10,
+                 ) -> None:
+        self.engine: AsyncEngine = create_async_engine(url=url,
+                                                       echo=echo,
+                                                       echo_pool=echo_pool,
+                                                       pool_size=pool_size,
+                                                       max_overflow=max_overflow)
+        self.session_factory: async_sessionmaker[AsyncSession] = async_sessionmaker(bind=self.engine,
+                                                                                    expire_on_commit=False,
+                                                                                    autoflush=False, autocommit=False)
+
+    def get_session(self, isolation_level: str | None = None, commit: bool = True):
+        async def yield_session() -> AsyncSession:
+            async with self.session_factory() as session:
+                try:
+                    if isolation_level:
+                        await session.execute(text(f"SET TRANSACTION ISOLATION LEVEL {isolation_level}"))
+                    yield session
+                    if commit:
+                        await session.commit()
+                except SQLAlchemyError as e:
+                    await session.rollback()
+                    log.error(e)
+
+        return yield_session
 
 
-int_pk = Annotated[int, mapped_column(primary_key=True)]
-created_at = Annotated[datetime, mapped_column(default=datetime.now(), server_default=func.now())]
-updated_at = Annotated[datetime, mapped_column(
-    default=datetime.now(), server_default=func.now(), onupdate=datetime.now)]
-str_uniq = Annotated[str, mapped_column(unique=True)]
-
-
-class Base(AsyncAttrs, DeclarativeBase):
-    __abstract__ = True
-
-    @declared_attr.directive
-    def __tablename__(cls) -> str:
-        return f"{cls.__name__.lower()}s"
-
-    created_at: Mapped[created_at]
-    updated_at: Mapped[updated_at]
+db_helper = DatabaseHelper(
+    url=settings.db.url,
+    echo=settings.db.echo,
+    echo_pool=settings.db.echo_pool,
+    pool_size=settings.db.pool_size,
+    max_overflow=settings.db.max_overflow
+)

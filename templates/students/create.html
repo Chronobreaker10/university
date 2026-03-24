@@ -1,0 +1,226 @@
+{% extends "base.html" %} {% block content %}
+{% include "toast.html" %}
+<body class="bg-gradient-to-br from-slate-50 to-blue-50 font-sans antialiased">
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+    <!-- Навигация обратно к списку студентов -->
+    <div class="mb-6">
+        <a href="{{ url_for('students.index') }}" id="backToTableLink"
+           class="inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-800 transition group">
+            <i class="fas fa-arrow-left text-sm group-hover:-translate-x-0.5 transition"></i>
+            <span class="font-medium">Назад к списку студентов</span>
+        </a>
+    </div>
+
+    <!-- Заголовок страницы -->
+    <div class="mb-8">
+        <div class="flex items-center gap-3 mb-2">
+            <div class="bg-indigo-100 p-3 rounded-2xl">
+                <i class="fas fa-user-plus text-indigo-600 text-xl"></i>
+            </div>
+            <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight text-slate-800">
+                {{ title }}
+            </h1>
+        </div>
+        <p class="text-slate-500 ml-1 text-sm md:text-base">Заполните информацию о новом студенте. Все поля, отмеченные
+            <span class="text-red-500">*</span>, обязательны для заполнения.</p>
+    </div>
+
+    <!-- Основная карточка формы -->
+    <div class="bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
+        <form id="studentForm" class="p-6 md:p-8 space-y-8" action="{{ url_for('students.post') }}" method="post">
+            <!-- Блок: Личная информация -->
+            <div>
+                <div class="flex items-center gap-2 border-b border-slate-200 pb-3 mb-6">
+                    <i class="fas fa-user-circle text-indigo-500 text-xl"></i>
+                    <h2 class="text-xl font-semibold text-slate-800">Личная информация</h2>
+                    <span class="text-xs text-slate-400 ml-auto">ID будет сгенерирован автоматически</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- ФИО -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-semibold text-slate-700">
+                            Имя <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <i class="fas fa-user absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                            <input type="text" id="first_name" name="first_name" required
+                                   placeholder="Иванов"
+                                   class="w-full pl-9 pr-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-400 focus:outline-none form-input-focus transition bg-slate-50 focus:bg-white">
+                        </div>
+                        <p class="text-xs text-slate-400">Введите имя студента</p>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="block text-sm font-semibold text-slate-700">
+                            Фамилия <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <i class="fas fa-user absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                            <input type="text" id="last_name" name="last_name" required
+                                   placeholder="Иван"
+                                   class="w-full pl-9 pr-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-400 focus:outline-none form-input-focus transition bg-slate-50 focus:bg-white">
+                        </div>
+                        <p class="text-xs text-slate-400">Введите фамилию студента</p>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-semibold text-slate-700">
+                            Email <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <i class="fas fa-envelope absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                            <input type="email" id="email" name="email" required
+                                   placeholder="student@example.com"
+                                   class="w-full pl-9 pr-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-400 focus:outline-none form-input-focus transition bg-slate-50 focus:bg-white">
+                        </div>
+                        <p class="text-xs text-slate-400">Используйте корпоративную или личную почту</p>
+                    </div>
+
+                    <!-- Телефон -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-semibold text-slate-700">
+                            Номер телефона
+                        </label>
+                        <div class="relative">
+                            <i class="fas fa-phone-alt absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                            <input type="tel" id="phone_number" name="phone_number" required
+                                   placeholder="+7-999-123-45-67"
+                                   class="w-full pl-9 pr-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-400 focus:outline-none form-input-focus transition bg-slate-50 focus:bg-white">
+                        </div>
+                        <p class="text-xs text-slate-400">Введите номер телефона студента</p>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="block text-sm font-semibold text-slate-700">
+                            Адрес<span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <i class="fas fa-address-card absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                            <input type="text" id="address" name="address" required
+                                   placeholder="г. Москва, ул. Тверская, д. 10, кв. 5"
+                                   class="w-full pl-9 pr-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-400 focus:outline-none form-input-focus transition bg-slate-50 focus:bg-white">
+                        </div>
+                        <p class="text-xs text-slate-400">Адрес проживания студента</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Блок: Учебная информация -->
+            <div>
+                <div class="flex items-center gap-2 border-b border-slate-200 pb-3 mb-6">
+                    <i class="fas fa-graduation-cap text-indigo-500 text-xl"></i>
+                    <h2 class="text-xl font-semibold text-slate-800">Учебная информация</h2>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label class="block text-sm font-semibold text-slate-700">
+                            Выберите курс <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <i class="fas fa-code absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                            <select id="major" name="major_id" required
+                                    class="w-full pl-9 pr-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-400 focus:outline-none form-input-focus transition bg-slate-50 focus:bg-white appearance-none cursor-pointer">
+                                {% for major in majors %}
+                                {% if major.id|string == request.query_params.get('major_id') %}
+                                <option value="{{ major.id }}" selected>{{ major.major_name }}</option>
+                                {% else %}
+                                <option value="{{ major.id }}">{{ major.major_name }}</option>
+                                {% endif %}
+                                {% endfor %}
+                            </select>
+                            <i class="fas fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none"></i>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="block text-sm font-semibold text-slate-700">
+                            Дата рождения <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <i class="fas fa-calendar-alt absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                            <input type="date" id="date_of_birth" name="date_of_birth" required
+                                   class="w-full pl-9 pr-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-400 focus:outline-none form-input-focus transition bg-slate-50 focus:bg-white">
+                        </div>
+                        <p class="text-xs text-slate-400">Дата рождения</p>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="block text-sm font-semibold text-slate-700">
+                            Год поступления <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <i class="fas fa-calendar-alt absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                            <input type="number" min="2000" max="2030" id="enrollment_year" name="enrollment_year"
+                                   required value="2026"
+                                   class="w-full pl-9 pr-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-400 focus:outline-none form-input-focus transition bg-slate-50 focus:bg-white">
+                        </div>
+                        <p class="text-xs text-slate-400">Год поступления</p>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="block text-sm font-semibold text-slate-700">
+                            Курс <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <i class="fas fa-graduation-cap absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                            <input type="number" min="1" max="6" id="course" name="course"
+                                   required value="1"
+                                   class="w-full pl-9 pr-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-400 focus:outline-none form-input-focus transition bg-slate-50 focus:bg-white">
+                        </div>
+                        <p class="text-xs text-slate-400">Курс студента</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Блок: Дополнительная информация -->
+            <div>
+                <div class="flex items-center gap-2 border-b border-slate-200 pb-3 mb-6">
+                    <i class="fas fa-info-circle text-indigo-500 text-xl"></i>
+                    <h2 class="text-xl font-semibold text-slate-800">Дополнительная информация</h2>
+                </div>
+
+                <div class="grid grid-cols-1 gap-6">
+
+                    <!-- Комментарий -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-semibold text-slate-700">
+                            Комментарий / Примечания
+                        </label>
+                        <div class="relative">
+                            <i class="fas fa-pen absolute left-3 top-4 text-slate-400 text-sm"></i>
+                            <textarea id="special_notes" name="special_notes" rows="3"
+                                      placeholder="Дополнительная информация о студенте, особые пожелания или заметки..."
+                                      class="w-full pl-9 pr-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-400 focus:outline-none form-input-focus transition bg-slate-50 focus:bg-white resize-none"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Кнопки действий -->
+            <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-slate-200">
+                <button type="submit" id="submitBtn"
+                        class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-semibold transition shadow-md hover:shadow-lg flex items-center justify-center gap-2">
+                    <i class="fas fa-save"></i>
+                    Создать студента
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Подсказка и дополнительная информация -->
+    <div class="mt-6 bg-indigo-50 rounded-xl p-4 border border-indigo-100">
+        <div class="flex gap-3">
+            <i class="fas fa-lightbulb text-indigo-500 text-lg mt-0.5"></i>
+            <div>
+                <p class="text-sm text-indigo-800 font-medium">После создания студент появится в общем списке</p>
+                <p class="text-xs text-indigo-600 mt-0.5">Все данные будут сохранены локально в демо-режиме. В реальном
+                    проекте отправляется запрос на сервер.</p>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+{% endblock %}

@@ -1,6 +1,3 @@
-from .student import StudentRead, StudentFilterByID, StudentUpdate, StudentCreate, StudentFilterParams, StudentFilter
-from .major import MajorCreate, MajorFilter
-
 __all__ = [
     'StudentRead',
     'StudentFilterByID',
@@ -9,5 +6,18 @@ __all__ = [
     'StudentFilterParams',
     'StudentFilter',
     'MajorCreate',
-    'MajorFilter'
+    'MajorFilter',
+    'MajorRead',
+    'UserCreate',
+    'UserRead',
+    'UserAuth',
+    'TokenData',
+    'Token',
+    'PaginationParams',
+    'StudentResponse'
 ]
+
+from .major import MajorCreate, MajorFilter, MajorRead
+from .student import (StudentRead, StudentFilterByID, StudentUpdate, StudentCreate, StudentFilterParams, StudentFilter,
+                      PaginationParams, StudentResponse)
+from .user import UserCreate, UserRead, UserAuth, TokenData, Token
