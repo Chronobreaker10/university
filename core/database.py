@@ -1,10 +1,11 @@
 from __future__ import annotations
+
 import logging
+
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession, AsyncEngine
 
-from core.errors import DatabaseError
 from .config import settings
 
 log = logging.getLogger(__name__)
