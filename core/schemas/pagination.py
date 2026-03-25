@@ -3,6 +3,12 @@ from __future__ import annotations
 from typing import Annotated
 
 from pydantic import BaseModel, Field
+from enum import Enum
+
+
+class MessageStatus(str, Enum):
+    SUCCESS = "success"
+    ERROR = "error"
 
 
 class PaginationResponse(BaseModel):
@@ -21,3 +27,7 @@ class PaginationParams(BaseModel):
 
 class DefaultResponse(BaseModel):
     message: Annotated[str, Field(min_length=1, max_length=100, title="Сообщение", description="Сообщение")]
+
+class FlashMessage(BaseModel):
+    text: Annotated[str, Field(min_length=1, max_length=100, title="Текс", description="Текст сообщения")]
+    status: Annotated[MessageStatus, Field(title="Статус", description="Статус сообщения")]

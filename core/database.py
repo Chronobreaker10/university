@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from typing import Any, AsyncGenerator
 
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
@@ -34,7 +35,7 @@ class DatabaseHelper:
         )
 
     def get_session(self, isolation_level: str | None = None, commit: bool = True):
-        async def yield_session() -> AsyncSession:
+        async def yield_session() -> AsyncGenerator[AsyncSession, Any]:
             async with self.session_factory() as session:
                 try:
                     if isolation_level:

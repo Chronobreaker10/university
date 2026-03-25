@@ -10,7 +10,7 @@ from api.dependencies.user import get_current_user
 from api.services.user import authenticate_user, register_user
 from core.config import settings
 from core.database import db_helper
-from core.schemas import UserAuth, UserRead, UserCreate, UserRegister
+from core.schemas import UserAuth, UserRead, UserCreate, UserRegister, FlashMessage, MessageStatus
 
 router = APIRouter(prefix="/auth", tags=["Авторизация"])
 templates = Jinja2Templates(directory="templates")
@@ -23,11 +23,10 @@ def check_cookie(func):
         if not token:
             return await func(request, *args, **kwargs)
         else:
-            request.session["flashed_message"] = {
-                "type": "success",
-                "text": "Вы уже вошли в систему!"
-            }
+            request.session["flashed_message"] = FlashMessage(status=MessageStatus.SUCCESS,
+                                                              text="Вы уже вошли в систему!").model_dump()
             return RedirectResponse(url=request.url_for("students.index"), status_code=status.HTTP_303_SEE_OTHER)
+
     return wrapper
 
 
@@ -36,8 +35,8 @@ async def get_profile(request: Request, current_user: Annotated[UserRead, Depend
     # token = request.cookies.get(settings.security.cookie_name)
     message = request.session.pop("flashed_message", "")
     return templates.TemplateResponse("auth/profile.html",
-                                      {"request": request, "title": "Мой профиль", "message": message,
-                                       "current_user": current_user})
+                                      {"request": request, "title": "Мой профиль",
+                                       "current_user": current_user, "message": message})
 
 
 @router.get("/login", name="auth.login_form")
@@ -64,34 +63,30 @@ async def login(request: Request, credentials: Annotated[UserAuth, Form()],
     response = RedirectResponse(url=request.url_for("students.index"), status_code=status.HTTP_303_SEE_OTHER)
     response.set_cookie(settings.security.cookie_name, token, httponly=True,
                         expires=settings.security.expires_minutes * 60)
-    request.session["flashed_message"] = {
-        "type": "success",
-        "text": "Вход успешно выполнен!"
-    }
+    request.session["flashed_message"] = FlashMessage(status=MessageStatus.SUCCESS,
+                                                      text="Вход успешно выполнен!").model_dump()
     return response
+
 
 @router.post("/register", name="auth.register")
 @check_cookie
 async def register(request: Request, data: Annotated[UserRegister, Form()],
-                session: Annotated[AsyncSession, Depends(db_helper.get_session())]):
+                   session: Annotated[AsyncSession, Depends(db_helper.get_session())]):
     user_data = UserCreate.model_validate(data.model_dump(exclude={"repeat_password"}))
     await register_user(session, user_data)
     token = await authenticate_user(session, data.email, data.hashed_password)
     response = RedirectResponse(url=request.url_for("students.index"), status_code=status.HTTP_303_SEE_OTHER)
     response.set_cookie(settings.security.cookie_name, token, httponly=True,
                         expires=settings.security.expires_minutes * 60)
-    request.session["flashed_message"] = {
-        "type": "success",
-        "text": "Вход успешно выполнен!"
-    }
+    request.session["flashed_message"] = FlashMessage(status=MessageStatus.SUCCESS,
+                                                      text="Вход успешно выполнен!").model_dump()
     return response
+
 
 @router.post("/logout", name="auth.logout")
 async def logout(request: Request):
     response = RedirectResponse(url=request.url_for("auth.login_form"), status_code=status.HTTP_303_SEE_OTHER)
     response.delete_cookie(settings.security.cookie_name)
-    request.session["flashed_message"] = {
-        "type": "success",
-        "text": "Вы успешно вышли из системы!"
-    }
+    request.session["flashed_message"] = FlashMessage(status=MessageStatus.SUCCESS,
+                                                      text="Вы успешно вышли из системы!").model_dump()
     return response

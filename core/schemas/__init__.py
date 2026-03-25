@@ -17,11 +17,13 @@ __all__ = [
     'StudentResponse',
     'MajorResponse',
     'DefaultResponse',
-    'UserRegister'
+    'UserRegister',
+    'FlashMessage',
+    'MessageStatus',
 ]
 
 from .major import MajorCreate, MajorFilter, MajorRead, MajorResponse
 from .student import (StudentRead, StudentFilterByID, StudentUpdate, StudentCreate, StudentFilterParams, StudentFilter,
                       StudentResponse)
 from .user import UserCreate, UserRead, UserAuth, TokenData, Token, UserRegister
-from .pagination import PaginationParams, DefaultResponse
+from .pagination import PaginationParams, DefaultResponse, FlashMessage, MessageStatus

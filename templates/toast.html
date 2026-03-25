@@ -2,13 +2,13 @@
 <div id="toast" class="fixed bottom-5 right-5 z-50">
     <div class="bg-white rounded-xl shadow-2xl border-l-4 border-indigo-500 p-4 min-w-[280px] toast-notification">
         <div class="flex items-center gap-3">
-            {% if message["type"] == "success" %}
+            {% if message.status == "success" %}
             <i class="fas fa-check-circle text-indigo-500 text-xl"></i>
             {% else %}
             <i class="fas fa-xmark-circle text-red-500 text-xl"></i>
             {% endif %}
             <div class="flex-1">
-                <p id="toastMessage" class="text-slate-500 text-xs mt-0.5">{{ message["text"] }}</p>
+                <p id="toastMessage" class="text-slate-500 text-xs mt-0.5">{{ message.text }}</p>
             </div>
         </div>
     </div>

@@ -6,7 +6,7 @@ from random import randint
 from typing import Annotated, AsyncGenerator
 
 import uvicorn
-from fastapi import FastAPI, Query, Path, HTTPException, status, Request
+from fastapi import FastAPI, Query, Path, HTTPException, status, Request, BackgroundTasks, Depends
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse, RedirectResponse, ORJSONResponse
 from fastapi.staticfiles import StaticFiles
@@ -19,7 +19,7 @@ import api.crud.students as student_crud
 from core.config import settings
 from core.database import db_helper
 from core.errors import BaseError
-from core.schemas import StudentRead, StudentUpdate, StudentFilterByID, StudentFilterParams
+from core.schemas import StudentRead, StudentUpdate, StudentFilterByID, StudentFilterParams, MessageStatus, FlashMessage
 from pages import router as page_router
 from api.views import router as api_router
 from utils import json_to_dict_list
@@ -37,8 +37,13 @@ async def lifespan(current_app: FastAPI) -> AsyncGenerator[None, None]:
     await db_helper.dispose()
 
 
+async def clear_session(request: Request):
+    yield
+    request.session.pop("flashed_data", None)
+
+
 app = FastAPI(lifespan=lifespan)
-frontend = FastAPI()
+frontend = FastAPI(dependencies=[Depends(clear_session)])
 api = FastAPI(default_response_class=ORJSONResponse)
 api.include_router(api_router)
 frontend.include_router(page_router)
@@ -121,7 +126,7 @@ async def delete_student(student_filter: StudentFilterByID):
 
 
 @api.exception_handler(BaseError)
-async def not_found_exception_handler(request, exc: BaseError):
+async def api_exception_handler(request, exc: BaseError):
     return JSONResponse(
         status_code=exc.code,
         content={"message": exc.message}
@@ -144,11 +149,9 @@ async def redirect_exception_handler(request: Request, exc: BaseError):
 
 
 @frontend.exception_handler(RequestValidationError)
-async def redirect_exception_handler(request: Request, exc: RequestValidationError):
-    request.session["flashed_message"] = {
-        "type": "error",
-        "text": "Проверьте правильность введенных данных!"
-    }
+async def redirect_validation_handler(request: Request, exc: RequestValidationError):
+    request.session["flashed_message"] = FlashMessage(status=MessageStatus.ERROR,
+                                                      text="Проверьте правильность введенных данных!").model_dump()
     form_data = await request.form()
     request.session["flashed_data"] = {
         key: value for key, value in form_data.items()
