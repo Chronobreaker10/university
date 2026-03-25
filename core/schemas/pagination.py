@@ -17,3 +17,7 @@ class PaginationParams(BaseModel):
     per_page: int = Field(ge=1, le=100, title="Количество элементов на странице",
                           description="Количество элементов на странице", default=2)
     search: Annotated[str, Field(title="Поиск", description="Поиск")] = ""
+
+
+class DefaultResponse(BaseModel):
+    message: Annotated[str, Field(min_length=1, max_length=100, title="Сообщение", description="Сообщение")]

@@ -11,7 +11,7 @@ class UserDAO(BaseDAO[User]):
     Model = User
 
     @classmethod
-    async def create(cls, session: AsyncSession, data: BaseModel) -> Model:
+    async def create(cls, session: AsyncSession, data: BaseModel) -> int:
         try:
             return await super().create(session, data)
         except IntegrityError as e:

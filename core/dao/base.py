@@ -16,12 +16,12 @@ class BaseDAO(Generic[T]):
     SEARCH_FIELDS: list[str]
 
     @classmethod
-    async def create(cls, session: AsyncSession, data: BaseModel) -> T:
+    async def create(cls, session: AsyncSession, data: BaseModel) -> int:
         data_dict = data.model_dump(exclude_unset=True)
         new_model = cls.Model(**data_dict)
         session.add(new_model)
         await session.flush()
-        return new_model
+        return new_model.id
 
     @classmethod
     async def add_all(cls, session: AsyncSession, data: list[BaseModel]) -> Sequence[T]:

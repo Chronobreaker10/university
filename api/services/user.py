@@ -10,7 +10,7 @@ from core.schemas import UserCreate
 from core.security.auth import get_password_hash, verify_password, create_access_token
 
 
-async def register_user(session: AsyncSession, data: UserCreate) -> User:
+async def register_user(session: AsyncSession, data: UserCreate) -> int:
     new_user = data.model_copy(update={"hashed_password": get_password_hash(data.hashed_password)})
     result = await UserDAO.create(session, new_user)
     return result

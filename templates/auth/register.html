@@ -1,3 +1,128 @@
 {% extends "base.html" %} {% block content %}
 {% include "toast.html" %}
+<body class="bg-gradient-to-br from-slate-50 via-indigo-50/30 to-blue-50 font-sans antialiased min-h-screen flex items-center justify-center p-4 bg-pattern">
+
+<div class="w-full max-w-md form-card">
+    <!-- Логотип и приветствие -->
+    <div class="text-center mb-8">
+        <div class="inline-flex items-center justify-center bg-indigo-100 p-4 rounded-2xl mb-4 shadow-sm">
+            <i class="fas fa-user-graduate text-indigo-600 text-3xl"></i>
+        </div>
+        <h1 class="text-3xl font-extrabold text-slate-800 mb-2">
+            Добро пожаловать
+        </h1>
+        <p class="text-slate-500 text-sm">
+            Зарегистрируйтесь в системе управления студентами
+        </p>
+    </div>
+
+    <!-- Основная карточка формы -->
+    <div class="bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
+        <form id="registerForm" class="p-6 md:p-8 space-y-6" method="post" action="{{ url_for('auth.register') }}">
+            <div class="space-y-2">
+                <label for="email" class="block text-sm font-semibold text-slate-700">
+                    Email
+                </label>
+                <div class="relative input-group">
+                    <i class="fas fa-envelope absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                    <input type="text" id="email" name="email" required
+                           placeholder="student@example.com"
+                           value="{{ request.session['flashed_data'].email if 'flashed_data' in request.session else '' }}"
+                           class="w-full pl-9 pr-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-400 focus:outline-none input-focus-ring transition bg-slate-50 focus:bg-white"
+                           autocomplete="email">
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <label for="phone_number" class="block text-sm font-semibold text-slate-700">
+                    Номер телефона
+                </label>
+                <div class="relative input-group">
+                    <i class="fas fa-phone absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                    <input type="text" id="phone_number" name="phone_number" required
+                           placeholder="+7-999-123-45-67"
+                           value="{{ request.session['flashed_data'].phone_number if 'flashed_data' in request.session else '' }}"
+                           class="w-full pl-9 pr-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-400 focus:outline-none input-focus-ring transition bg-slate-50 focus:bg-white"
+                           autocomplete="tel">
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <label for="firstName" class="block text-sm font-semibold text-slate-700">
+                    Ваше имя
+                </label>
+                <div class="relative input-group">
+                    <i class="fas fa-user absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                    <input type="text" id="firstName" name="first_name" required
+                           placeholder="Иван"
+                           value="{{ request.session['flashed_data'].first_name if 'flashed_data' in request.session else '' }}"
+                           class="w-full pl-9 pr-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-400 focus:outline-none input-focus-ring transition bg-slate-50 focus:bg-white">
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <label for="lastName" class="block text-sm font-semibold text-slate-700">
+                    Ваша фамилия
+                </label>
+                <div class="relative input-group">
+                    <i class="fas fa-user absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                    <input type="text" id="lastName" name="last_name" required
+                           placeholder="Иванов"
+                           value="{{ request.session['flashed_data'].last_name if 'flashed_data' in request.session else '' }}"
+                           class="w-full pl-9 pr-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-400 focus:outline-none input-focus-ring transition bg-slate-50 focus:bg-white">
+                </div>
+            </div>
+
+
+            <div class="space-y-2">
+                <div class="flex justify-between items-end">
+                    <label for="password" class="block text-sm font-semibold text-slate-700">
+                        Пароль
+                    </label>
+                </div>
+                <div class="relative input-group">
+                    <i class="fas fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                    <input type="password" id="password" name="hashed_password" required
+                           placeholder="••••••••"
+                           class="w-full pl-9 pr-12 py-3 rounded-xl border border-slate-200 focus:border-indigo-400 focus:outline-none input-focus-ring transition bg-slate-50 focus:bg-white"
+                           autocomplete="current-password">
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <div class="flex justify-between items-end">
+                    <label for="repeatPassword" class="block text-sm font-semibold text-slate-700">
+                        Повторите пароль
+                    </label>
+                </div>
+                <div class="relative input-group">
+                    <i class="fas fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                    <input type="password" id="repeatPassword" name="repeat_password" required
+                           placeholder="••••••••"
+                           class="w-full pl-9 pr-12 py-3 rounded-xl border border-slate-200 focus:border-indigo-400 focus:outline-none input-focus-ring transition bg-slate-50 focus:bg-white"
+                           autocomplete="current-password">
+                </div>
+            </div>
+
+
+            <!-- Кнопка входа -->
+            <button type="submit" id="registerBtn"
+                    class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-semibold transition shadow-md hover:shadow-lg flex items-center justify-center gap-2 group">
+                <i class="fas fa-sign-in-alt group-hover:translate-x-0.5 transition"></i>
+                Регистрация
+            </button>
+        </form>
+    </div>
+
+    <!-- Дополнительная информация и ссылка на регистрацию -->
+    <div class="mt-6 text-center space-y-3">
+        <p class="text-sm text-slate-500">
+            Уже есть аккаунт?
+            <a href="{{ url_for('auth.login') }}" id="loginLink"
+               class="text-indigo-600 hover:text-indigo-800 font-semibold transition">
+                Войти
+            </a>
+        </p>
+    </div>
+</div>
 {% endblock %}

@@ -39,13 +39,13 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- ФИО -->
                     <div class="space-y-2">
-                        <label class="block text-sm font-semibold text-slate-700">
+                        <label class="block text-sm font-semibold text-slate-700" for="first_name">
                             Имя <span class="text-red-500">*</span>
                         </label>
                         <div class="relative">
                             <i class="fas fa-user absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
                             <input type="text" id="first_name" name="first_name" required
-                                   placeholder="Иванов"
+                                   placeholder="Иван"
                                    value="{{ request.session['flashed_data'].first_name if 'flashed_data' in request.session else '' }}"
                                    class="w-full pl-9 pr-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-400 focus:outline-none form-input-focus transition bg-slate-50 focus:bg-white">
                         </div>
@@ -53,13 +53,13 @@
                     </div>
 
                     <div class="space-y-2">
-                        <label class="block text-sm font-semibold text-slate-700">
+                        <label class="block text-sm font-semibold text-slate-700" for="last_name">
                             Фамилия <span class="text-red-500">*</span>
                         </label>
                         <div class="relative">
                             <i class="fas fa-user absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
                             <input type="text" id="last_name" name="last_name" required
-                                   placeholder="Иван"
+                                   placeholder="Иванов"
                                    value="{{ request.session['flashed_data'].last_name if 'flashed_data' in request.session else '' }}"
                                    class="w-full pl-9 pr-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-400 focus:outline-none form-input-focus transition bg-slate-50 focus:bg-white">
                         </div>
@@ -68,7 +68,7 @@
 
                     <!-- Email -->
                     <div class="space-y-2">
-                        <label class="block text-sm font-semibold text-slate-700">
+                        <label class="block text-sm font-semibold text-slate-700" for="email">
                             Email <span class="text-red-500">*</span>
                         </label>
                         <div class="relative">
@@ -83,7 +83,7 @@
 
                     <!-- Телефон -->
                     <div class="space-y-2">
-                        <label class="block text-sm font-semibold text-slate-700">
+                        <label class="block text-sm font-semibold text-slate-700" for="phone_number">
                             Номер телефона
                         </label>
                         <div class="relative">
@@ -97,7 +97,7 @@
                     </div>
 
                     <div class="space-y-2">
-                        <label class="block text-sm font-semibold text-slate-700">
+                        <label class="block text-sm font-semibold text-slate-700" for="address">
                             Адрес<span class="text-red-500">*</span>
                         </label>
                         <div class="relative">

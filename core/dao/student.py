@@ -33,8 +33,7 @@ class StudentDAO(BaseDAO[Student]):
     @classmethod
     async def create(cls, session: AsyncSession, data: BaseModel) -> int:
         try:
-            result = await super().create(session, data)
-            return result.id
+            return await super().create(session, data)
         except IntegrityError as e:
             raise StudentAlreadyExistsError from e
 

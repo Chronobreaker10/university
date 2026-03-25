@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from pydantic import BaseModel, Field, EmailStr, ConfigDict
+from pydantic import BaseModel, Field, EmailStr, ConfigDict, model_validator
 from pydantic_extra_types.phone_numbers import PhoneNumber
 from enum import Enum
 
@@ -24,6 +24,18 @@ class UserCreate(UserBase):
     hashed_password: Annotated[
         str, Field(min_length=5, max_length=100, title="Пароль", description="Пароль, от 5 до 100 символов")
     ]
+
+class UserRegister(UserCreate):
+    repeat_password: Annotated[
+        str, Field(min_length=5, max_length=100, title="Пароль", description="Пароль, от 5 до 100 символов")
+    ]
+
+    @model_validator(mode='after')
+    def check_passwords(self):
+        if self.hashed_password != self.repeat_password:
+            raise ValueError('Пароли не совпадают')
+        return self
+
 
 
 class UserAuth(BaseModel):

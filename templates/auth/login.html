@@ -26,12 +26,11 @@
                 </label>
                 <div class="relative input-group">
                     <i class="fas fa-envelope absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
-                    <input type="text" id="email" name="email"
+                    <input type="text" id="email" name="email" required
                            placeholder="student@example.com"
                            class="w-full pl-9 pr-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-400 focus:outline-none input-focus-ring transition bg-slate-50 focus:bg-white"
                            autocomplete="username">
                 </div>
-                <p class="text-xs text-slate-400" id="emailHint">Используйте demo@study.ru</p>
             </div>
 
             <!-- Поле Пароль -->
@@ -43,16 +42,11 @@
                 </div>
                 <div class="relative input-group">
                     <i class="fas fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
-                    <input type="password" id="password" name="password"
+                    <input type="password" id="password" name="password" required
                            placeholder="••••••••"
                            class="w-full pl-9 pr-12 py-3 rounded-xl border border-slate-200 focus:border-indigo-400 focus:outline-none input-focus-ring transition bg-slate-50 focus:bg-white"
                            autocomplete="current-password">
-                    <button type="button" id="togglePassword"
-                            class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition">
-                        <i class="fas fa-eye-slash text-sm"></i>
-                    </button>
                 </div>
-                <p class="text-xs text-slate-400">Демо-пароль: demo123 или admin123</p>
             </div>
 
             <!-- Кнопка входа -->
@@ -68,9 +62,9 @@
     <div class="mt-6 text-center space-y-3">
         <p class="text-sm text-slate-500">
             Нет аккаунта?
-            <button id="registerLink" class="text-indigo-600 hover:text-indigo-800 font-semibold transition">
+            <a href="{{ url_for('auth.register_form') }}" id="registerLink" class="text-indigo-600 hover:text-indigo-800 font-semibold transition">
                 Создать аккаунт
-            </button>
+            </a>
         </p>
     </div>
 </div>
