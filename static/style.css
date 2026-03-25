@@ -82,3 +82,48 @@
 .bg-pattern {
     background-image: radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.03) 0%, transparent 50%);
 }
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.mobile-menu-open {
+    animation: slideDown 0.2s ease-out;
+}
+
+/* активная ссылка */
+.nav-link-active {
+    background-color: rgba(99, 102, 241, 0.1);
+    color: #4f46e5;
+}
+
+/* переходы */
+.nav-link {
+    transition: all 0.2s ease;
+}
+
+/* аватарка */
+.avatar-hover:hover {
+    transform: scale(1.05);
+    transition: transform 0.2s ease;
+}
+
+/* скроллбар для мобильного меню */
+.mobile-menu-scroll {
+    max-height: calc(100vh - 70px);
+    overflow-y: auto;
+}
+
+.majors-table tbody tr {
+    transition: all 0.2s ease;
+}
+.majors-table tbody tr:hover {
+    background-color: #f8fafc;
+}

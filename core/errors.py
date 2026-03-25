@@ -6,15 +6,11 @@ from fastapi import status
 class BaseError(Exception):
     code: int
     message: str
-
-
-class RedirectError(Exception):
-    code: int
-    message: str
     redirect_to: str | None = None
+    flash: bool = False
 
 
-class DatabaseError(RedirectError):
+class DatabaseError(BaseError):
     code = status.HTTP_500_INTERNAL_SERVER_ERROR
     message = "При работе с базой данных произошла ошибка"
 
@@ -27,14 +23,17 @@ class NotFoundError(BaseError):
 class UserAlreadyExistsError(BaseError):
     code = status.HTTP_409_CONFLICT
     message = "Пользователь уже существует"
+    flash = True
 
 
-class StudentAlreadyExistsError(RedirectError):
+class StudentAlreadyExistsError(BaseError):
     code = status.HTTP_409_CONFLICT
     message = "Студент уже существует"
+    redirect_to = "students.create"
+    flash = True
 
 
-class UnauthorizedError(RedirectError):
+class UnauthorizedError(BaseError):
     code = status.HTTP_401_UNAUTHORIZED
     message = "Неверный email или пароль"
     redirect_to = "auth.login_form"
@@ -43,6 +42,6 @@ class UnauthorizedError(RedirectError):
         self.message = message or self.message
 
 
-class ForbiddenError(RedirectError):
+class ForbiddenError(BaseError):
     code = status.HTTP_403_FORBIDDEN
     message = "Доступ запрещен"

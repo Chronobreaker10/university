@@ -4,6 +4,8 @@ from typing import Annotated
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from core.schemas.pagination import PaginationResponse
+
 
 class MajorCreate(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -27,6 +29,10 @@ class MajorRead(MajorCreate):
 
 class MajorFilter(BaseModel):
     major_name: Annotated[
-        str | None, Field(min_length=1, max_length=50, title="Название",
-                   description="Название специальности, от 1 до 50 символов")
+        str | None, Field(max_length=50, title="Название",
+                          description="Название специальности, от 1 до 50 символов")
     ] = None
+
+
+class MajorResponse(PaginationResponse):
+    majors: Annotated[list[MajorRead], Field(title="Список специальностей", description="Список специальностей")]

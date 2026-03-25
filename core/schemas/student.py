@@ -9,6 +9,7 @@ from pydantic import BaseModel, Field, EmailStr, field_validator, field_serializ
 from pydantic_extra_types.phone_numbers import PhoneNumber
 
 from core.schemas.major import MajorRead
+from core.schemas.pagination import PaginationParams, PaginationResponse
 
 
 class Major(str, Enum):
@@ -88,7 +89,8 @@ class StudentRead(StudentCreate):
     #     Field(min_length=1, max_length=50, title="Специальность",
     #           description="Специальность студента, от 1 до 50 символов")
     # ]
-    major: Annotated[MajorRead, Field(exclude=True)]
+    # major: Annotated[MajorRead, Field(exclude=True)]
+    major: MajorRead
 
     @computed_field
     @property
@@ -103,13 +105,6 @@ class StudentFilterParams(BaseModel):
         int | None, Field(gt=2010, lt=2025, title="Год поступления", description="Год поступления")] = None
 
 
-class PaginationParams(BaseModel):
-    page: int = Field(ge=1, title="Страница", description="Номер страницы", default=1)
-    per_page: int = Field(ge=1, le=100, title="Количество элементов на странице",
-                          description="Количество элементов на странице", default=2)
-    search: Annotated[str, Field(title="Поиск", description="Поиск")] = ""
-
-
 class StudentFilter(PaginationParams):
     course: Annotated[int | None, Field(ge=1, le=5, title="Курс", description="Курс")] = None
     major_id: Annotated[int | None, Field(title="Специальность", description="Специальность")] = None
@@ -117,10 +112,6 @@ class StudentFilter(PaginationParams):
         int | None, Field(gt=2010, lt=2025, title="Год поступления", description="Год поступления")] = None
 
 
-class StudentResponse(BaseModel):
+class StudentResponse(PaginationResponse):
     students: Annotated[list[StudentRead], Field(title="Список студентов", description="Список студентов")]
-    total_count: Annotated[
-        int, Field(ge=0, title="Общее количество студентов", description="Общее количество студентов")]
-    prev_page_url: Annotated[str | None, Field(title="Предыдущая страница", description="URL предыдущей страницы")]
-    next_page_url: Annotated[str | None, Field(title="Следующая страница", description="URL следующей страницы")]
     majors: Annotated[list[MajorRead], Field(title="Список специальностей", description="Список специальностей")]

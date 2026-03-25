@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TypeVar, Generic, Sequence, Callable
 
 from pydantic import BaseModel
-from sqlalchemy import select, delete, update, func
+from sqlalchemy import select, delete, update, func, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.models import Base
@@ -13,6 +13,7 @@ T = TypeVar("T", bound=Base)
 
 class BaseDAO(Generic[T]):
     Model: type[T]
+    SEARCH_FIELDS: list[str]
 
     @classmethod
     async def create(cls, session: AsyncSession, data: BaseModel) -> T:
@@ -42,12 +43,13 @@ class BaseDAO(Generic[T]):
         return result.scalar_one_or_none()
 
     @classmethod
-    async def find_by_filter(cls, session: AsyncSession, filters: BaseModel | None) -> Sequence[T]:
+    async def find_by_filter(cls, session: AsyncSession, filters: BaseModel | None = None) -> Sequence[T]:
         if filters is None:
             query = select(cls.Model)
         else:
             filter_dict = filters.model_dump(exclude_unset=True)
             query = select(cls.Model).filter_by(**filter_dict)
+            print(filter_dict)
         result = await session.execute(query)
         return result.scalars().all()
 
@@ -83,7 +85,7 @@ class BaseDAO(Generic[T]):
         return result.rowcount
 
     @classmethod
-    async def get_count(cls, session: AsyncSession, filters: BaseModel | None) -> int:
+    async def get_count(cls, session: AsyncSession, filters: BaseModel | None = None) -> int:
         if filters is None:
             query = select(func.count(cls.Model.id))
         else:
@@ -91,3 +93,30 @@ class BaseDAO(Generic[T]):
             query = select(func.count(cls.Model.id)).filter_by(**filter_dict)
         result = await session.execute(query)
         return result.scalar()
+
+    @classmethod
+    async def search_all_with_count(cls, session: AsyncSession, keyword: str, offset: int | None = None,
+                                    limit: int | None = None) \
+            -> tuple[int, Sequence[Model]]:
+        query = select(cls.Model)
+        conditions = []
+        for field in cls.SEARCH_FIELDS:
+            if field in cls.Model.__table__.columns:
+                conditions.append(getattr(cls.Model, field).ilike(f"%{keyword}%"))
+        query = query.where(or_(*conditions))
+        if offset is not None:
+            query = query.offset(offset)
+        if limit is not None:
+            query = query.limit(limit)
+        result = await session.execute(query)
+        count_query = await session.scalar(select(func.count()).select_from(query.subquery()))
+        return count_query, result.scalars().all()
+
+    @classmethod
+    async def find_by_filter_with_limit_offset(cls, session: AsyncSession, filters: BaseModel, offset: int, limit: int) \
+            -> Sequence[Model]:
+        filter_dict = filters.model_dump(exclude_unset=True)
+        query = select(cls.Model).filter_by(**filter_dict).offset(offset).limit(
+            limit)
+        result = await session.execute(query)
+        return result.scalars().all()

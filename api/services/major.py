@@ -10,8 +10,13 @@ from core.models import Major
 from core.errors import NotFoundError
 
 
-async def get_majors_by_filter(session: AsyncSession, major_filter: MajorFilter | None) -> list[Major]:
-    return await MajorDAO.find_by_filter(session, major_filter)
+async def get_majors_by_filter(session: AsyncSession, major_filter: MajorFilter | None) -> tuple[list[Major], int]:
+    if major_filter is not None and major_filter.major_name is not None:
+        total_count, majors = await MajorDAO.search_all_with_count(session, major_filter.major_name)
+    else:
+        majors = await MajorDAO.find_by_filter(session)
+        total_count = await MajorDAO.get_count(session)
+    return list(majors), total_count
 
 
 async def get_major_by_id(session: AsyncSession, major_id: int) -> Major:

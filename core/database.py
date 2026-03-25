@@ -19,14 +19,19 @@ class DatabaseHelper:
                  pool_size: int = 5,
                  max_overflow: int = 10,
                  ) -> None:
-        self.engine: AsyncEngine = create_async_engine(url=url,
-                                                       echo=echo,
-                                                       echo_pool=echo_pool,
-                                                       pool_size=pool_size,
-                                                       max_overflow=max_overflow)
-        self.session_factory: async_sessionmaker[AsyncSession] = async_sessionmaker(bind=self.engine,
-                                                                                    expire_on_commit=False,
-                                                                                    autoflush=False, autocommit=False)
+        self.engine: AsyncEngine = create_async_engine(
+            url=url,
+            echo=echo,
+            echo_pool=echo_pool,
+            pool_size=pool_size,
+            max_overflow=max_overflow
+        )
+        self.session_factory: async_sessionmaker[AsyncSession] = async_sessionmaker(
+            bind=self.engine,
+            expire_on_commit=False,
+            autoflush=False,
+            autocommit=False
+        )
 
     def get_session(self, isolation_level: str | None = None, commit: bool = True):
         async def yield_session() -> AsyncSession:
@@ -42,6 +47,9 @@ class DatabaseHelper:
                     log.error(e)
 
         return yield_session
+
+    async def dispose(self) -> None:
+        await self.engine.dispose()
 
 
 db_helper = DatabaseHelper(

@@ -28,7 +28,7 @@ async def get_student_by_id(session: AsyncSession, student_id: int) -> Student:
     return result
 
 
-async def create_student(session: AsyncSession, data: StudentCreate) -> Student:
+async def create_student(session: AsyncSession, data: StudentCreate) -> int:
     result = await StudentDAO.create(session, data)
     return result
 

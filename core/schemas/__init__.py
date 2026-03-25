@@ -14,10 +14,12 @@ __all__ = [
     'TokenData',
     'Token',
     'PaginationParams',
-    'StudentResponse'
+    'StudentResponse',
+    'MajorResponse'
 ]
 
-from .major import MajorCreate, MajorFilter, MajorRead
+from .major import MajorCreate, MajorFilter, MajorRead, MajorResponse
 from .student import (StudentRead, StudentFilterByID, StudentUpdate, StudentCreate, StudentFilterParams, StudentFilter,
-                      PaginationParams, StudentResponse)
+                      StudentResponse)
 from .user import UserCreate, UserRead, UserAuth, TokenData, Token
+from .pagination import PaginationParams

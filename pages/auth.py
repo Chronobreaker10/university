@@ -6,13 +6,23 @@ from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from api.dependencies.user import get_current_user
 from api.services.user import authenticate_user
 from core.config import settings
 from core.database import db_helper
-from core.schemas import UserAuth
+from core.schemas import UserAuth, UserRead
 
 router = APIRouter(prefix="/auth", tags=["Авторизация"])
 templates = Jinja2Templates(directory="templates")
+
+
+@router.get("/profile", name="auth.profile")
+async def get_profile(request: Request, current_user: Annotated[UserRead, Depends(get_current_user)]):
+    # token = request.cookies.get(settings.security.cookie_name)
+    message = request.session.pop("flashed_message", "")
+    return templates.TemplateResponse("auth/profile.html",
+                                      {"request": request, "title": "Мой профиль", "message": message,
+                                       "current_user": current_user})
 
 
 @router.get("/login", name="auth.login_form")

@@ -1,0 +1,107 @@
+{% extends "base.html" %} {% block content %}
+{% include "toast.html" %}
+<body class="bg-gradient-to-br from-slate-50 to-blue-50 font-sans antialiased">
+<div class="max-w-[80%] mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+    <!-- Заголовок и кнопка добавления -->
+    <div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+            <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight text-slate-800 inline-flex items-center gap-3">
+                <i class="fas fa-graduation-cap text-indigo-500 text-3xl"></i>
+                Специальности
+            </h1>
+            <p class="text-slate-500 mt-1 text-sm md:text-base">Управление направлениями подготовки • Всего
+                специальностей:
+                <span id="totalMajorsCount">{{ response.total_count }}</span></p>
+        </div>
+        <button id="addMajorBtn"
+                class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl shadow-md transition flex items-center gap-2 text-sm font-medium">
+            <i class="fas fa-plus-circle"></i> Добавить специальность
+        </button>
+    </div>
+
+    <!-- Поиск -->
+    <div class="mb-6 flex flex-col sm:flex-row gap-4 justify-between items-center">
+        <form class="relative w-full sm:w-96" id="searchForm" method="get" action="">
+            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+            <input type="text" id="searchInput" placeholder="Поиск по имени, телефону, email или адресу..."
+                   name="major_name"
+                   class="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-300 transition text-sm">
+        </form>
+        <div class="flex gap-2">
+            <form id="resetForm" method="get" action="">
+                <button id="resetFilter"
+                        class="text-slate-500 hover:text-indigo-600 px-3 py-2 rounded-xl border border-slate-200 bg-white text-sm transition">
+                    <i class="fas fa-undo-alt"></i> Сброс
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Таблица специальностей -->
+    <div class="table-wrapper overflow-x-auto bg-white rounded-2xl shadow-lg border border-slate-100">
+        <table class="majors-table min-w-full text-sm text-left text-slate-700">
+            <thead class="bg-slate-50 text-xs uppercase font-semibold text-slate-500 border-b border-slate-200">
+            <tr>
+                <th scope="col" class="px-5 py-4 rounded-tl-xl">
+                    <div class="flex items-center gap-1">
+                        <i class="fas fa-hashtag text-slate-400"></i> ID
+                    </div>
+                </th>
+                <th scope="col" class="px-5 py-4">
+                    <div class="flex items-center gap-1">
+                        <i class="fas fa-book text-slate-400"></i> Название
+                    </div>
+                </th>
+                <th scope="col" class="px-5 py-4">
+                    <div class="flex items-center gap-1">
+                        <i class="fas fa-align-left text-slate-400"></i> Описание
+                    </div>
+                </th>
+                <th scope="col" class="px-5 py-4">
+                    <div class="flex items-center gap-1">
+                        <i class="fas fa-users text-slate-400"></i> Студентов
+                    </div>
+                </th>
+                <th scope="col" class="px-5 py-4 rounded-tr-xl text-center">
+                    <div class="flex items-center justify-center gap-1">
+                        <i class="fas fa-tools text-slate-400"></i> Действия
+                    </div>
+                </th>
+            </tr>
+            </thead>
+            <tbody id="majorsTableBody">
+            {% for major in response.majors %}
+            <tr class="border-b border-slate-100 hover:bg-slate-50 transition">
+                <td class="px-5 py-3 font-mono text-xs text-slate-500">{{ major.id }}</td>
+                <td class="px-5 py-3 font-semibold text-slate-800">{{ major.major_name }}</td>
+                <td class="px-5 py-3 text-slate-600 text-sm max-w-md">{{ major.major_description }}</td>
+                <td class="px-5 py-3">
+                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-medium">
+                            <i class="fas fa-user-graduate text-xs"></i>
+                            {{ major.count_students }}
+                        </span>
+                </td>
+                <td class="px-5 py-3 text-center">
+                    <div class="flex items-center justify-center gap-2">
+                        <button onclick="openEditModal(${specialty.id})"
+                                class="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition group">
+                            <i class="fas fa-edit group-hover:scale-110 transition"></i>
+                        </button>
+                        <button onclick="openDeleteModal(${specialty.id})"
+                                class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition group">
+                            <i class="fas fa-trash-alt group-hover:scale-110 transition"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <div id="noResultsMessage" class="hidden text-center py-10 text-slate-400 bg-white">
+            <i class="fas fa-folder-open text-4xl mb-2 opacity-50"></i>
+            <p class="text-md">Специальности не найдены</p>
+        </div>
+    </div>
+</div>
+</body>
+{% endblock %}

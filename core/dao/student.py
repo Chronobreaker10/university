@@ -25,28 +25,16 @@ class StudentDAO(BaseDAO[Student]):
         return result.scalars().all()
 
     @classmethod
-    async def search_all_with_count(cls, session: AsyncSession, keyword: str, offset: int, limit: int) \
-            -> tuple[int, Sequence[Student]]:
-        query = select(cls.Model).options(joinedload(cls.Model.major))
-        conditions = []
-        for field in cls.SEARCH_FIELDS:
-            if field in cls.Model.__table__.columns:
-                conditions.append(getattr(cls.Model, field).ilike(f"%{keyword}%"))
-        query = query.where(or_(*conditions))
-        result = await session.execute(query.offset(offset).limit(limit))
-        count_query = await session.scalar(select(func.count()).select_from(query.subquery()))
-        return count_query, result.scalars().all()
-
-    @classmethod
     async def get_one_by_id_with_major(cls, session: AsyncSession, student_id: int):
         query = select(cls.Model).options(joinedload(cls.Model.major)).filter_by(id=student_id).limit(1)
         result = await session.execute(query)
         return result.scalar_one_or_none()
 
     @classmethod
-    async def create(cls, session: AsyncSession, data: BaseModel) -> Model:
+    async def create(cls, session: AsyncSession, data: BaseModel) -> int:
         try:
-            return await super().create(session, data)
+            result = await super().create(session, data)
+            return result.id
         except IntegrityError as e:
             raise StudentAlreadyExistsError from e
 

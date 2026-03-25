@@ -46,6 +46,7 @@
                             <i class="fas fa-user absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
                             <input type="text" id="first_name" name="first_name" required
                                    placeholder="Иванов"
+                                   value="{{ request.session['flashed_data'].first_name if 'flashed_data' in request.session else '' }}"
                                    class="w-full pl-9 pr-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-400 focus:outline-none form-input-focus transition bg-slate-50 focus:bg-white">
                         </div>
                         <p class="text-xs text-slate-400">Введите имя студента</p>
@@ -59,6 +60,7 @@
                             <i class="fas fa-user absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
                             <input type="text" id="last_name" name="last_name" required
                                    placeholder="Иван"
+                                   value="{{ request.session['flashed_data'].last_name if 'flashed_data' in request.session else '' }}"
                                    class="w-full pl-9 pr-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-400 focus:outline-none form-input-focus transition bg-slate-50 focus:bg-white">
                         </div>
                         <p class="text-xs text-slate-400">Введите фамилию студента</p>
@@ -73,6 +75,7 @@
                             <i class="fas fa-envelope absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
                             <input type="email" id="email" name="email" required
                                    placeholder="student@example.com"
+                                   value="{{ request.session['flashed_data'].email if 'flashed_data' in request.session else '' }}"
                                    class="w-full pl-9 pr-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-400 focus:outline-none form-input-focus transition bg-slate-50 focus:bg-white">
                         </div>
                         <p class="text-xs text-slate-400">Используйте корпоративную или личную почту</p>
@@ -87,6 +90,7 @@
                             <i class="fas fa-phone-alt absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
                             <input type="tel" id="phone_number" name="phone_number" required
                                    placeholder="+7-999-123-45-67"
+                                   value="{{ request.session['flashed_data'].phone_number if 'flashed_data' in request.session else '' }}"
                                    class="w-full pl-9 pr-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-400 focus:outline-none form-input-focus transition bg-slate-50 focus:bg-white">
                         </div>
                         <p class="text-xs text-slate-400">Введите номер телефона студента</p>
@@ -100,6 +104,7 @@
                             <i class="fas fa-address-card absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
                             <input type="text" id="address" name="address" required
                                    placeholder="г. Москва, ул. Тверская, д. 10, кв. 5"
+                                   value="{{ request.session['flashed_data'].address if 'flashed_data' in request.session else '' }}"
                                    class="w-full pl-9 pr-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-400 focus:outline-none form-input-focus transition bg-slate-50 focus:bg-white">
                         </div>
                         <p class="text-xs text-slate-400">Адрес проживания студента</p>
@@ -124,7 +129,7 @@
                             <select id="major" name="major_id" required
                                     class="w-full pl-9 pr-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-400 focus:outline-none form-input-focus transition bg-slate-50 focus:bg-white appearance-none cursor-pointer">
                                 {% for major in majors %}
-                                {% if major.id|string == request.query_params.get('major_id') %}
+                                {% if 'flashed_data' in request.session and major.id|string == request.session['flashed_data'].major_id %}
                                 <option value="{{ major.id }}" selected>{{ major.major_name }}</option>
                                 {% else %}
                                 <option value="{{ major.id }}">{{ major.major_name }}</option>
@@ -142,6 +147,7 @@
                         <div class="relative">
                             <i class="fas fa-calendar-alt absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
                             <input type="date" id="date_of_birth" name="date_of_birth" required
+                                   value="{{ request.session['flashed_data'].date_of_birth if 'flashed_data' in request.session else '' }}"
                                    class="w-full pl-9 pr-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-400 focus:outline-none form-input-focus transition bg-slate-50 focus:bg-white">
                         </div>
                         <p class="text-xs text-slate-400">Дата рождения</p>
@@ -154,7 +160,8 @@
                         <div class="relative">
                             <i class="fas fa-calendar-alt absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
                             <input type="number" min="2000" max="2030" id="enrollment_year" name="enrollment_year"
-                                   required value="2026"
+                                   required
+                                   value="{{ request.session['flashed_data'].enrollment_year if 'flashed_data' in request.session else '2026' }}"
                                    class="w-full pl-9 pr-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-400 focus:outline-none form-input-focus transition bg-slate-50 focus:bg-white">
                         </div>
                         <p class="text-xs text-slate-400">Год поступления</p>
@@ -167,7 +174,8 @@
                         <div class="relative">
                             <i class="fas fa-graduation-cap absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
                             <input type="number" min="1" max="6" id="course" name="course"
-                                   required value="1"
+                                   required
+                                   value="{{ request.session['flashed_data'].course if 'flashed_data' in request.session else '1' }}"
                                    class="w-full pl-9 pr-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-400 focus:outline-none form-input-focus transition bg-slate-50 focus:bg-white">
                         </div>
                         <p class="text-xs text-slate-400">Курс студента</p>
@@ -193,7 +201,9 @@
                             <i class="fas fa-pen absolute left-3 top-4 text-slate-400 text-sm"></i>
                             <textarea id="special_notes" name="special_notes" rows="3"
                                       placeholder="Дополнительная информация о студенте, особые пожелания или заметки..."
-                                      class="w-full pl-9 pr-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-400 focus:outline-none form-input-focus transition bg-slate-50 focus:bg-white resize-none"></textarea>
+                                      class="w-full pl-9 pr-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-400 focus:outline-none form-input-focus transition bg-slate-50 focus:bg-white resize-none">
+                                {{ request.session['flashed_data'].special_notes if 'flashed_data' in request.session else '' }}
+                            </textarea>
                         </div>
                     </div>
                 </div>
