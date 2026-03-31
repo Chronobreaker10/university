@@ -18,7 +18,8 @@
 
     <!-- Основная карточка формы -->
     <div class="bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
-        <form id="loginForm" class="p-6 md:p-8 space-y-6" method="post">
+        <form id="loginForm" class="p-6 md:p-8 space-y-6" method="post" action="{{ url_for('auth.login').include_query_params(next=request.query_params.get('next', '')) }}">
+            <input type="hidden" name="csrf_secret_token" value="{{ csrf_token }}">
             <!-- Поле Email / Логин -->
             <div class="space-y-2">
                 <label for="email" class="block text-sm font-semibold text-slate-700">

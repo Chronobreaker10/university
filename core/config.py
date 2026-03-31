@@ -52,6 +52,14 @@ class SecurityConfig(BaseModel):
     expires_minutes: int = 30
 
 
+class CsrfConfig(BaseModel):
+    secret_key: str
+    cookie_samesite: str = "none"
+    cookie_secure: bool = True
+    token_location: Literal["header", "body"] = "body"
+    token_key: str = "csrf_secret_token"
+
+
 class RedisConfig(BaseModel):
     host: str = "localhost"
     port: int = 6379
@@ -65,6 +73,7 @@ class CacheConfig(BaseModel):
 class Settings(BaseSettings):
     db: DatabaseConfig
     security: SecurityConfig
+    csrf: CsrfConfig
     cache: CacheConfig = CacheConfig()
     redis: RedisConfig = RedisConfig()
     run: RunConfig = RunConfig()

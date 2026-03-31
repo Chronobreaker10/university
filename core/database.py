@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, Asyn
 
 from .config import settings
 
-log = logging.getLogger(__name__)
+from core.logger import app_errors_logger
 
 
 class DatabaseHelper:
@@ -34,18 +34,16 @@ class DatabaseHelper:
             autocommit=False
         )
 
-    def get_session(self, isolation_level: str | None = None, commit: bool = True):
+    def get_session(self, isolation_level: str | None = None):
         async def yield_session() -> AsyncGenerator[AsyncSession, Any]:
             async with self.session_factory() as session:
                 try:
                     if isolation_level:
                         await session.execute(text(f"SET TRANSACTION ISOLATION LEVEL {isolation_level}"))
                     yield session
-                    if commit:
-                        await session.commit()
                 except SQLAlchemyError as e:
                     await session.rollback()
-                    log.error(e)
+                    app_errors_logger.error(e, exc_info=True)
 
         return yield_session
 

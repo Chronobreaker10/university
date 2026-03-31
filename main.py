@@ -6,23 +6,25 @@ from random import randint
 from typing import Annotated, AsyncGenerator
 
 import uvicorn
-from fastapi import FastAPI, Query, Path, HTTPException, status, Request, BackgroundTasks, Depends
-from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse, RedirectResponse, ORJSONResponse
+from fastapi import FastAPI, Query, Path, HTTPException, Request, Depends
+from fastapi.responses import ORJSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
+from fastapi_csrf_protect import CsrfProtect
 from redis.asyncio import Redis
 from starlette.middleware.sessions import SessionMiddleware
 
 import api.crud.students as student_crud
+from api.views import router as api_router
 from core.config import settings
 from core.database import db_helper
-from core.errors import BaseError
-from core.schemas import StudentRead, StudentUpdate, StudentFilterByID, StudentFilterParams, MessageStatus, FlashMessage
+from core.schemas import StudentRead, StudentUpdate, StudentFilterByID, StudentFilterParams
 from pages import router as page_router
-from api.views import router as api_router
 from utils import json_to_dict_list
+from datetime import datetime
+import time
+from core.logger import access_logger
 
 parent_dir = pathlib.Path(__file__).parent
 data_dir = parent_dir / 'students.json'
@@ -51,6 +53,25 @@ app.add_middleware(SessionMiddleware, secret_key=settings.security.secret_key)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 app.mount("/api", api)
 app.mount("/pages", frontend)
+
+
+@app.middleware("http")
+async def log_request(request, call_next):
+    start_time = time.time()
+    client_ip = request.client.host if request.client else "unknown"
+    response = await call_next(request)
+    process_time = time.time() - start_time
+    timestamp = datetime.now().strftime("%d/%b/%Y:%H:%M:%S +0300")
+    log_message = (f'{client_ip} - - [{timestamp}] "{request.method} {request.url.path} '
+                   f'HTTP/{request.scope.get("http_version", "1.1")}" {response.status_code} '
+                   f'- "-" "{request.headers.get("user-agent", "-")}" {process_time:.3f}s')
+    access_logger.info(log_message)
+    return response
+
+
+@CsrfProtect.load_config
+def get_csrf_config():
+    return settings.csrf
 
 
 @app.get("/")
@@ -123,40 +144,6 @@ async def delete_student(student_filter: StudentFilterByID):
         return {"message": "Студент успешно удален!"}
     else:
         raise HTTPException(status_code=400, detail="Ошибка при удалении студента")
-
-
-@api.exception_handler(BaseError)
-async def api_exception_handler(request, exc: BaseError):
-    return JSONResponse(
-        status_code=exc.code,
-        content={"message": exc.message}
-    )
-
-
-@frontend.exception_handler(BaseError)
-async def redirect_exception_handler(request: Request, exc: BaseError):
-    request.session["flashed_message"] = {
-        "type": "error",
-        "text": exc.message
-    }
-    if exc.flash:
-        form_data = await request.form()
-        request.session["flashed_data"] = {
-            key: value for key, value in form_data.items()
-        }
-    url = request.url_for(exc.redirect_to) if exc.redirect_to else request.url
-    return RedirectResponse(url=url, status_code=status.HTTP_303_SEE_OTHER)
-
-
-@frontend.exception_handler(RequestValidationError)
-async def redirect_validation_handler(request: Request, exc: RequestValidationError):
-    request.session["flashed_message"] = FlashMessage(status=MessageStatus.ERROR,
-                                                      text="Проверьте правильность введенных данных!").model_dump()
-    form_data = await request.form()
-    request.session["flashed_data"] = {
-        key: value for key, value in form_data.items()
-    }
-    return RedirectResponse(url=request.url, status_code=status.HTTP_303_SEE_OTHER)
 
 
 if __name__ == '__main__':

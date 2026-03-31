@@ -25,6 +25,7 @@ class UserCreate(UserBase):
         str, Field(min_length=5, max_length=100, title="Пароль", description="Пароль, от 5 до 100 символов")
     ]
 
+
 class UserRegister(UserCreate):
     repeat_password: Annotated[
         str, Field(min_length=5, max_length=100, title="Пароль", description="Пароль, от 5 до 100 символов")
@@ -35,7 +36,6 @@ class UserRegister(UserCreate):
         if self.hashed_password != self.repeat_password:
             raise ValueError('Пароли не совпадают')
         return self
-
 
 
 class UserAuth(BaseModel):

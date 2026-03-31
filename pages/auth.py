@@ -1,15 +1,19 @@
+from __future__ import annotations
+
 from typing import Annotated
 from functools import wraps
-from fastapi import APIRouter, Request, Depends
+from fastapi import APIRouter, Request, Depends, Query
 from fastapi import status, Form
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
+from fastapi_csrf_protect import CsrfProtect
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.dependencies.user import get_current_user
 from api.services.user import authenticate_user, register_user
 from core.config import settings
 from core.database import db_helper
+from fastapi.encoders import jsonable_encoder
 from core.schemas import UserAuth, UserRead, UserCreate, UserRegister, FlashMessage, MessageStatus
 
 router = APIRouter(prefix="/auth", tags=["Авторизация"])
@@ -23,8 +27,8 @@ def check_cookie(func):
         if not token:
             return await func(request, *args, **kwargs)
         else:
-            request.session["flashed_message"] = FlashMessage(status=MessageStatus.SUCCESS,
-                                                              text="Вы уже вошли в систему!").model_dump()
+            request.session["flashed_message"] = jsonable_encoder(FlashMessage(status=MessageStatus.SUCCESS,
+                                                                               text="Вы уже вошли в систему!"))
             return RedirectResponse(url=request.url_for("students.index"), status_code=status.HTTP_303_SEE_OTHER)
 
     return wrapper
@@ -41,10 +45,14 @@ async def get_profile(request: Request, current_user: Annotated[UserRead, Depend
 
 @router.get("/login", name="auth.login_form")
 @check_cookie
-async def login_form(request: Request):
+async def login_form(request: Request, csrf_protect: Annotated[CsrfProtect, Depends()]):
     message = request.session.pop("flashed_message", "")
-    return templates.TemplateResponse("auth/login.html",
-                                      {"request": request, "title": "Авторизация", "message": message})
+    csrf_token, signed_token = csrf_protect.generate_csrf_tokens()
+    response = templates.TemplateResponse("auth/login.html",
+                                          {"request": request, "title": "Авторизация", "message": message,
+                                           "csrf_token": csrf_token})
+    csrf_protect.set_csrf_cookie(signed_token, response)
+    return response
 
 
 @router.get("/register", name="auth.register_form")
@@ -58,13 +66,21 @@ async def register_form(request: Request):
 @router.post("/login", name="auth.login")
 @check_cookie
 async def login(request: Request, credentials: Annotated[UserAuth, Form()],
-                session: Annotated[AsyncSession, Depends(db_helper.get_session())]):
-    token = await authenticate_user(session, credentials.email, credentials.password)
-    response = RedirectResponse(url=request.url_for("students.index"), status_code=status.HTTP_303_SEE_OTHER)
+                session: Annotated[AsyncSession, Depends(db_helper.get_session())],
+                csrf_protect: Annotated[CsrfProtect, Depends()],
+                next_redirect: Annotated[str | None, Query(alias="next")] = None):
+    await csrf_protect.validate_csrf(request)
+    token, user = await authenticate_user(session, credentials.email, credentials.password)
+    url = request.url_for("students.index")
+    if next_redirect:
+        url = next_redirect
+    response = RedirectResponse(url=url, status_code=status.HTTP_303_SEE_OTHER)
     response.set_cookie(settings.security.cookie_name, token, httponly=True,
                         expires=settings.security.expires_minutes * 60)
-    request.session["flashed_message"] = FlashMessage(status=MessageStatus.SUCCESS,
-                                                      text="Вход успешно выполнен!").model_dump()
+    request.session["flashed_message"] = jsonable_encoder(FlashMessage(status=MessageStatus.SUCCESS,
+                                                                       text="Вход успешно выполнен!"))
+    request.session["current_user"] = jsonable_encoder(user)
+    csrf_protect.unset_csrf_cookie(response)
     return response
 
 

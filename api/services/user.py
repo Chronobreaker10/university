@@ -23,10 +23,10 @@ async def get_user_by_id(session: AsyncSession, user_id: int) -> User:
     return user
 
 
-async def authenticate_user(session: AsyncSession, email: str, password: str) -> str:
+async def authenticate_user(session: AsyncSession, email: str, password: str) -> tuple[str, User]:
     UserEmail = create_model("UserEmail", email=(str, ...))
     user = await UserDAO.find_one_or_none(session, UserEmail(email=email))
     if not user or not verify_password(password, user.hashed_password):
         raise UnauthorizedError
     token = create_access_token(data={"sub": str(user.id)})
-    return token
+    return token, user

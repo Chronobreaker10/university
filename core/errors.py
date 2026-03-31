@@ -42,6 +42,18 @@ class UnauthorizedError(BaseError):
         self.message = message or self.message
 
 
+class JWTError(BaseError):
+    code = status.HTTP_401_UNAUTHORIZED
+    message = "Для доступа к ресурсу необходимо авторизоваться"
+    redirect_to = "auth.login_form"
+
+
+class InvalidCredentials(BaseError):
+    code = status.HTTP_401_UNAUTHORIZED
+    message = "Проверьте логин и пароль"
+    redirect_to = "auth.login_form"
+
+
 class ForbiddenError(BaseError):
     code = status.HTTP_403_FORBIDDEN
     message = "Доступ запрещен"

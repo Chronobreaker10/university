@@ -5,7 +5,7 @@ import jwt
 from datetime import datetime, timedelta, timezone
 from core.config import settings
 from core.schemas import TokenData
-from core.errors import UnauthorizedError
+from core.errors import JWTError
 
 password_hash = PasswordHash((
     Argon2Hasher(), BcryptHasher()
@@ -32,8 +32,7 @@ def validate_token(token: str) -> TokenData:
         payload = jwt.decode(token, settings.security.secret_key, algorithms=[settings.security.algorithm])
         user_id = payload.get("sub")
         if not user_id:
-            raise UnauthorizedError
+            raise JWTError
         return TokenData(user_id=user_id)
     except jwt.InvalidTokenError as e:
-        print(e.args)
-        raise UnauthorizedError("Invalid token")
+        raise JWTError
