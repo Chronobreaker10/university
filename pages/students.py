@@ -11,7 +11,7 @@ from api.dependencies.user import get_current_user
 from api.views.major import get_all_majors
 from api.views.students import get_all_students
 from core.database import db_helper
-from core.schemas import StudentResponse, StudentCreate, MajorRead, UserRead, FlashMessage, MessageStatus
+from core.schemas import StudentResponse, StudentCreate, UserRead, FlashMessage, MessageStatus, MajorResponse
 
 router = APIRouter(prefix="/students", tags=["Студенты"])
 templates = Jinja2Templates(directory="templates")
@@ -27,14 +27,15 @@ def get_students(request: Request, data: Annotated[StudentResponse, Depends(get_
 
 
 @router.get("/create", name="students.create")
-def create_student(request: Request, majors: Annotated[list[MajorRead], Depends(get_all_majors)],
+def create_student(request: Request, majors: Annotated[MajorResponse, Depends(get_all_majors)],
                    current_user: Annotated[UserRead, Depends(get_current_user)]):
+    message = request.session.pop("flashed_message", "")
     return templates.TemplateResponse("students/create.html",
-                                      {"request": request, "title": "Добавить студента", "majors": majors,
-                                       "current_user": current_user})
+                                      {"request": request, "title": "Добавить студента", "majors": majors.majors,
+                                       "current_user": current_user, "message": message})
 
 
-@router.post("/", name="students.post")
+@router.post("/create", name="students.post")
 async def post_student(request: Request, student: Annotated[StudentCreate, Form()],
                        session: Annotated[AsyncSession, Depends(db_helper.get_session())],
                        current_user: Annotated[UserRead, Depends(get_current_user)]):

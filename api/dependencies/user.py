@@ -1,22 +1,24 @@
 from typing import Annotated
 
+from fastapi import Request, Depends, Response
 from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi import Request, Depends
+
+import api.services.auth as auth_service
+import api.services.user as service
 from core.config import settings
+from core.database import db_helper
+from core.errors import UnauthorizedError, ForbiddenError
+from core.models import Role
 from core.models import User
 from core.security.auth import validate_token
-from core.errors import UnauthorizedError, ForbiddenError
-import api.services.user as service
-from core.database import db_helper
-from core.models import Role
 
 
 async def get_current_user(session: Annotated[AsyncSession, Depends(db_helper.get_session())],
                            request: Request) -> User:
-    token = request.cookies.get(settings.security.cookie_name)
-    if not token:
-        raise UnauthorizedError("Для доступа к ресурсу необходимо авторизоваться")
-    data = validate_token(token)
+    access_token = request.cookies.get(settings.security.access_token_cookie_name)
+    if not access_token:
+        raise UnauthorizedError
+    data = validate_token(access_token)
     return await service.get_user_by_id(session, data.user_id)
 
 

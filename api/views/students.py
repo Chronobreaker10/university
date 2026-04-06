@@ -1,6 +1,6 @@
+import json
 import math
 from typing import Annotated
-
 from fastapi import APIRouter, Depends, status, Query, Path, Request, BackgroundTasks
 from fastapi_cache import FastAPICache
 from fastapi_cache.decorator import cache
@@ -13,6 +13,8 @@ from core.database import db_helper
 from core.models import Role
 from core.schemas import StudentRead, StudentCreate, StudentFilter, StudentResponse, MajorRead
 from cache import common_key_builder
+from core.redis import get_redis
+
 
 router = APIRouter(prefix='/students', tags=['Студенты'])
 

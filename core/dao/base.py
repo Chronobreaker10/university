@@ -49,7 +49,6 @@ class BaseDAO(Generic[T]):
         else:
             filter_dict = filters.model_dump(exclude_unset=True)
             query = select(cls.Model).filter_by(**filter_dict)
-            print(filter_dict)
         result = await session.execute(query)
         return result.scalars().all()
 

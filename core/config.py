@@ -2,6 +2,12 @@ import logging
 from typing import Literal
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import BaseModel, PostgresDsn, RedisDsn
+from enum import Enum
+
+
+class Environment(str, Enum):
+    DEV = "dev"
+    PROD = "prod"
 
 LOG_DEFAULT_FORMAT = (
     "[%(asctime)s.%(msecs)03d] %(module)10s:%(lineno)-3d %(levelname)-7s - %(message)s"
@@ -46,10 +52,13 @@ class DatabaseConfig(BaseModel):
 
 
 class SecurityConfig(BaseModel):
-    cookie_name: str = "access_token"
+    access_token_cookie_name: str = "access_token"
+    refresh_token_cookie_name: str = "refresh_token"
     secret_key: str
     algorithm: str
-    expires_minutes: int = 30
+    access_token_expires_minutes: int = 15
+    refresh_token_expires_days: int = 30
+    refresh_token_key: str = "refresh_tokens"
 
 
 class CsrfConfig(BaseModel):
@@ -62,7 +71,9 @@ class CsrfConfig(BaseModel):
 
 class RedisConfig(BaseModel):
     host: str = "localhost"
-    port: int = 6379
+    port: int = 6378
+    db: int = 1
+    prefix: str = "university"
 
 
 class CacheConfig(BaseModel):
@@ -79,6 +90,7 @@ class Settings(BaseSettings):
     run: RunConfig = RunConfig()
     logging: LoggingConfig = LoggingConfig()
     TEST_DATABASE_URL: str = "sqlite+aiosqlite://"
+    ENV: str = Environment.DEV
     model_config = SettingsConfigDict(
         env_file=(".env.template", ".env"),
         case_sensitive=False,
@@ -87,3 +99,4 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+

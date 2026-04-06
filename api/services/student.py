@@ -30,15 +30,18 @@ async def get_student_by_id(session: AsyncSession, student_id: int) -> Student:
 
 async def create_student(session: AsyncSession, data: StudentCreate) -> int:
     result = await StudentDAO.create(session, data)
+    await session.commit()
     return result
 
 
 async def update_student(session: AsyncSession, student_id: int, data: StudentCreate) -> Student:
     student = await get_student_by_id(session, student_id)
     await StudentDAO.update(session, student, data)
+    await session.commit()
     return student
 
 
 async def delete_student(session: AsyncSession, student_id: int) -> None:
     student = await get_student_by_id(session, student_id)
     await StudentDAO.delete(session, student)
+    await session.commit()

@@ -15,7 +15,6 @@ router = APIRouter(prefix='/majors', tags=['Специальности'])
 @router.get("/", summary="Получить список всех специальностей", response_model=MajorResponse)
 async def get_all_majors(session: Annotated[AsyncSession, Depends(db_helper.get_session())],
                          major_filter: Annotated[MajorFilter, Query()]):
-    print(major_filter)
     majors, total_count = await service.get_majors_by_filter(session, major_filter)
     return MajorResponse(majors=[MajorRead.model_validate(major) for major in majors],
                          total_count=total_count, next_page_url=None, prev_page_url=None)

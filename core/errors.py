@@ -35,20 +35,15 @@ class StudentAlreadyExistsError(BaseError):
 
 class UnauthorizedError(BaseError):
     code = status.HTTP_401_UNAUTHORIZED
-    message = "Неверный email или пароль"
+    message = "Для доступа к ресурсу необходимо авторизоваться"
     redirect_to = "auth.login_form"
 
     def __init__(self, message: str = None):
         self.message = message or self.message
 
 
-class JWTError(BaseError):
-    code = status.HTTP_401_UNAUTHORIZED
-    message = "Для доступа к ресурсу необходимо авторизоваться"
-    redirect_to = "auth.login_form"
 
-
-class InvalidCredentials(BaseError):
+class InvalidCredentialsError(BaseError):
     code = status.HTTP_401_UNAUTHORIZED
     message = "Проверьте логин и пароль"
     redirect_to = "auth.login_form"

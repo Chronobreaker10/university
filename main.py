@@ -1,30 +1,32 @@
 from __future__ import annotations
 
 import pathlib
+import time
 from contextlib import asynccontextmanager
+from datetime import datetime
 from random import randint
 from typing import Annotated, AsyncGenerator
 
 import uvicorn
-from fastapi import FastAPI, Query, Path, HTTPException, Request, Depends
-from fastapi.responses import ORJSONResponse
+from fastapi import FastAPI, Query, Path, HTTPException, Request, Depends, status
+from fastapi.responses import ORJSONResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
 from fastapi_csrf_protect import CsrfProtect
 from redis.asyncio import Redis
+import api.services.auth as auth_service
 from starlette.middleware.sessions import SessionMiddleware
 
 import api.crud.students as student_crud
 from api.views import router as api_router
 from core.config import settings
 from core.database import db_helper
+from core.errors import UnauthorizedError
+from core.logger import access_logger, app_errors_logger
 from core.schemas import StudentRead, StudentUpdate, StudentFilterByID, StudentFilterParams
 from pages import router as page_router
 from utils import json_to_dict_list
-from datetime import datetime
-import time
-from core.logger import access_logger
 
 parent_dir = pathlib.Path(__file__).parent
 data_dir = parent_dir / 'students.json'
@@ -32,11 +34,11 @@ data_dir = parent_dir / 'students.json'
 
 @asynccontextmanager
 async def lifespan(current_app: FastAPI) -> AsyncGenerator[None, None]:
-    redis = Redis(host=settings.redis.host, port=settings.redis.port,
-                  db=settings.cache.db_name)
+    redis = Redis(host=settings.redis.host, port=settings.redis.port, db=settings.cache.db_name)
     FastAPICache.init(RedisBackend(redis), prefix=settings.cache.prefix)
     yield
     await db_helper.dispose()
+    await redis.close()
 
 
 async def clear_session(request: Request):
@@ -66,6 +68,26 @@ async def log_request(request, call_next):
                    f'HTTP/{request.scope.get("http_version", "1.1")}" {response.status_code} '
                    f'- "-" "{request.headers.get("user-agent", "-")}" {process_time:.3f}s')
     access_logger.info(log_message)
+    return response
+
+
+@app.middleware("http")
+async def auth_middleware(request: Request, call_next):
+    access_token = request.cookies.get(settings.security.access_token_cookie_name)
+    response = await call_next(request)
+    if not access_token:
+        refresh_token = request.cookies.get(settings.security.refresh_token_cookie_name)
+        if refresh_token:
+            refresh_token = request.cookies.get(settings.security.refresh_token_cookie_name)
+            try:
+                access_token, refresh_token = await auth_service.refresh_tokens(refresh_token)
+                response.set_cookie(settings.security.access_token_cookie_name, access_token, httponly=True,
+                                    expires=settings.security.access_token_expires_minutes * 60)
+                response.set_cookie(settings.security.refresh_token_cookie_name, refresh_token, httponly=True,
+                                    expires=settings.security.refresh_token_expires_days * 24 * 60 * 60)
+            except:
+                pass
+
     return response
 
 
@@ -144,6 +166,9 @@ async def delete_student(student_filter: StudentFilterByID):
         return {"message": "Студент успешно удален!"}
     else:
         raise HTTPException(status_code=400, detail="Ошибка при удалении студента")
+
+
+import pages.exception_handlers
 
 
 if __name__ == '__main__':
