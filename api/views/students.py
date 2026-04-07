@@ -34,7 +34,6 @@ async def add_student(session: Annotated[AsyncSession, Depends(db_helper.get_ses
 @router.get("/", summary="Получить список всех студентов", response_model=StudentResponse,
             dependencies=[Depends(user_has_roles(ACCESS_ROLES))])
 @cache(expire=60, key_builder=common_key_builder, namespace="students")
-#
 async def get_all_students(session: Annotated[AsyncSession, Depends(db_helper.get_session())],
                            student_filter: Annotated[StudentFilter, Query()], request: Request) -> StudentResponse:
     prev_url, next_url = None, None

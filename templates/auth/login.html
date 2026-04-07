@@ -18,7 +18,8 @@
 
     <!-- Основная карточка формы -->
     <div class="bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
-        <form id="loginForm" class="p-6 md:p-8 space-y-6" method="post" action="{{ url_for('auth.login').include_query_params(next=request.query_params.get('next', '')) }}">
+        <form id="loginForm" class="p-6 md:p-8 space-y-6" method="post"
+              action="{{ url_for('auth.login').include_query_params(next=request.query_params.get('next', '')) }}">
             <input type="hidden" name="csrf_secret_token" value="{{ csrf_token }}">
             <!-- Поле Email / Логин -->
             <div class="space-y-2">
@@ -27,7 +28,7 @@
                 </label>
                 <div class="relative input-group">
                     <i class="fas fa-envelope absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
-                    <input type="text" id="email" name="email" required
+                    <input type="text" id="email" name="username" required
                            placeholder="student@example.com"
                            class="w-full pl-9 pr-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-400 focus:outline-none input-focus-ring transition bg-slate-50 focus:bg-white"
                            autocomplete="username">
@@ -40,6 +41,10 @@
                     <label for="password" class="block text-sm font-semibold text-slate-700">
                         Пароль
                     </label>
+                    <a href="{{ url_for('auth.reset_password_form') }}" type="button" id="forgotPasswordBtn"
+                            class="text-xs text-indigo-600 hover:text-indigo-800 transition font-medium">
+                        Забыли пароль?
+                    </a>
                 </div>
                 <div class="relative input-group">
                     <i class="fas fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
@@ -63,7 +68,8 @@
     <div class="mt-6 text-center space-y-3">
         <p class="text-sm text-slate-500">
             Нет аккаунта?
-            <a href="{{ url_for('auth.register_form') }}" id="registerLink" class="text-indigo-600 hover:text-indigo-800 font-semibold transition">
+            <a href="{{ url_for('auth.register_form') }}" id="registerLink"
+               class="text-indigo-600 hover:text-indigo-800 font-semibold transition">
                 Создать аккаунт
             </a>
         </p>

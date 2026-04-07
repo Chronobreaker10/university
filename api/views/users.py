@@ -44,7 +44,7 @@ async def register(session: Annotated[AsyncSession, Depends(db_helper.get_sessio
 @router.post("/login", summary="Войти", response_model=Token)
 async def login(session: Annotated[AsyncSession, Depends(db_helper.get_session())], response: Response,
                 credentials: UserAuth):
-    access_token, refresh_token = await auth_service.login_user(session, credentials.email, credentials.password)
+    access_token, refresh_token, user = await auth_service.login_user(session, credentials.email, credentials.password)
     response.set_cookie(settings.security.access_token_cookie_name, access_token, httponly=True,
                         expires=settings.security.access_token_expires_minutes * 60)
     response.set_cookie(settings.security.refresh_token_cookie_name, refresh_token, httponly=True,

@@ -19,21 +19,21 @@
             <div class="hidden md:flex items-center gap-1">
                 <!-- Список студентов -->
                 <a href="{{ url_for('students.index') }}" id="navStudents"
-                   class="nav-link px-4 py-2 rounded-xl text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 transition flex items-center gap-2 font-medium">
+                   class="nav-link px-4 py-2 rounded-xl {{ 'text-indigo-500' if request.scope['route'].name == 'students.index' else 'text-slate-600' }} hover:text-indigo-600 hover:bg-indigo-50 transition flex items-center gap-2 font-medium">
                     <i class="fas fa-users text-sm"></i>
                     <span>Студенты</span>
                 </a>
 
                 <!-- Специальности -->
                 <a href="{{ url_for('majors.index') }}" id="navSpecialties"
-                   class="nav-link px-4 py-2 rounded-xl text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 transition flex items-center gap-2 font-medium">
+                   class="nav-link px-4 py-2 rounded-xl {{ 'text-indigo-500' if request.scope['route'].name == 'majors.index' else 'text-slate-600' }} hover:text-indigo-600 hover:bg-indigo-50 transition flex items-center gap-2 font-medium">
                     <i class="fas fa-graduation-cap text-sm"></i>
                     <span>Специальности</span>
                 </a>
 
                 <!-- Профиль -->
                 <a href="{{ url_for('auth.profile') }}" id="navProfile"
-                   class="nav-link px-4 py-2 rounded-xl text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 transition flex items-center gap-2 font-medium">
+                   class="nav-link {{ 'text-indigo-500' if request.scope['route'].name == 'auth.profile' else 'text-slate-600' }} px-4 py-2 rounded-xl hover:text-indigo-600 hover:bg-indigo-50 transition flex items-center gap-2 font-medium">
                     <i class="fas fa-user-circle text-sm"></i>
                     <span>Профиль</span>
                 </a>
@@ -85,17 +85,17 @@
 
             <!-- Ссылки навигации мобильные -->
             <a href="{{ url_for('students.index') }}" id="mobileNavStudents"
-               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 transition font-medium">
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl {{ 'text-indigo-500' if request.scope['route'].name == 'students.index' else 'text-slate-600' }} hover:bg-indigo-50 hover:text-indigo-600 transition font-medium">
                 <i class="fas fa-users w-5"></i>
-                <span>Список студентов</span>
+                <span>Студенты</span>
             </a>
             <a href="{{ url_for('majors.index') }}" id="mobileNavSpecialties"
-               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 transition font-medium">
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl {{ 'text-indigo-500' if request.scope['route'].name == 'majors.index' else 'text-slate-600' }} hover:bg-indigo-50 hover:text-indigo-600 transition font-medium">
                 <i class="fas fa-graduation-cap w-5"></i>
                 <span>Специальности</span>
             </a>
             <a href="{{ url_for('auth.profile') }}" id="mobileNavProfile"
-               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 transition font-medium">
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl {{ 'text-indigo-500' if request.scope['route'].name == 'auth.profile' else 'text-slate-600' }} hover:bg-indigo-50 hover:text-indigo-600 transition font-medium">
                 <i class="fas fa-user-circle w-5"></i>
                 <span>Мой профиль</span>
             </a>

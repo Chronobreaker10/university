@@ -14,6 +14,7 @@ from core.models import User
 from core.redis import get_redis
 from core.schemas import UserCreate
 from core.security.auth import get_password_hash, verify_password, create_access_token, create_refresh_token
+from core.broker import broker
 from datetime import datetime, timezone
 
 
@@ -21,6 +22,7 @@ async def register_user(session: AsyncSession, data: UserCreate) -> int:
     new_user = data.model_copy(update={"hashed_password": get_password_hash(data.hashed_password)})
     result = await UserDAO.create(session, new_user)
     await session.commit()
+    await broker.publish(message=new_user.email, queue="user-registered")
     return result
 
 
@@ -38,6 +40,21 @@ async def logout_user(user: User, token: str) -> bool:
     if not res:
         raise UnauthorizedError
     return True
+
+async def logout_all_devices(user: User, token: str) -> bool:
+    logout_result = await logout_user(user, token)
+    if not logout_result:
+        return False
+    pattern = f"{settings.redis.prefix}:{settings.security.refresh_token_key}:{user.id}:*"
+    redis = get_redis()
+    async with redis.pipeline(transaction=True) as pipe:
+        async for key in redis.scan_iter(match=pattern):
+            pipe.delete(key)
+        result = await pipe.execute()
+    if result:
+        return True
+    return False
+
 
 
 async def login_user(session: AsyncSession, email: str, password: str):

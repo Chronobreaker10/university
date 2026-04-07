@@ -1,115 +1,131 @@
 {% extends "base.html" %} {% block content %}
 {% include "toast.html" %}
 <body class="bg-gradient-to-br from-slate-50 to-blue-50 font-sans antialiased min-h-screen">
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
-        <div class="mb-8">
-            <div class="flex items-center gap-3 mb-2">
-                <div class="bg-indigo-100 p-3 rounded-2xl">
-                    <i class="fas fa-user-circle text-indigo-600 text-2xl"></i>
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+    <div class="mb-8">
+        <div class="flex items-center gap-3 mb-2">
+            <div class="bg-indigo-100 p-3 rounded-2xl">
+                <i class="fas fa-user-circle text-indigo-600 text-2xl"></i>
+            </div>
+            <div>
+                <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight text-slate-800">
+                    Профиль пользователя
+                </h1>
+                <p class="text-slate-500 text-sm mt-1">Управление личными данными и безопасностью аккаунта</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Левая колонка - аватар и действия -->
+        <div class="lg:col-span-1">
+            <div class="bg-white rounded-2xl shadow-lg border border-slate-100 overflow-hidden sticky top-24 profile-card">
+                <div class="bg-gradient-to-r from-indigo-500 to-indigo-600 px-6 py-8 text-center">
+                    <div class="w-28 h-28 mx-auto bg-white rounded-full flex items-center justify-center shadow-lg mb-4">
+                        <i class="fas fa-user text-indigo-600 text-5xl"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-white" id="profileFullName">{{ current_user.first_name }} {{
+                        current_user.last_name }}</h2>
+                    <div class="inline-flex items-center gap-1 mt-2 px-3 py-1 bg-white/20 rounded-full text-white text-xs">
+                        <i class="fas fa-shield-alt"></i>
+                        <span id="profileRoleBadge">{{ current_user.role }} </span>
+                    </div>
                 </div>
-                <div>
-                    <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight text-slate-800">
-                        Профиль пользователя
-                    </h1>
-                    <p class="text-slate-500 text-sm mt-1">Управление личными данными и безопасностью аккаунта</p>
+
+                <div class="p-5 space-y-3 border-t border-slate-100">
+                    <button id="editProfileBtn"
+                            class="action-btn w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-xl transition font-medium">
+                        <i class="fas fa-pen"></i>
+                        Редактировать профиль
+                    </button>
+                    <button id="changePasswordBtn"
+                            class="action-btn w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-xl transition font-medium">
+                        <i class="fas fa-key"></i>
+                        Изменить пароль
+                    </button>
+                    {% if not current_user.verified_email %}
+                    <a href="{{ url_for('auth.verify_email_request') }}" id="verifyEmailBtn"
+                       class="action-btn w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-xl transition font-medium">
+                        <i class="fas fa-email"></i>
+                        Подтвердить почту
+                    </a>
+                    {% endif %}
+                    <form method="post" action="{{ url_for('auth.logout_all') }}">
+                        <button id="logoutAllDevicesBtn" type="submit"
+                                class="action-btn w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-700 rounded-xl transition font-medium">
+                            <i class="fas fa-sign-out-alt"></i>
+                            Выйти со всех устройств
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Левая колонка - аватар и действия -->
-            <div class="lg:col-span-1">
-                <div class="bg-white rounded-2xl shadow-lg border border-slate-100 overflow-hidden sticky top-24 profile-card">
-                    <div class="bg-gradient-to-r from-indigo-500 to-indigo-600 px-6 py-8 text-center">
-                        <div class="w-28 h-28 mx-auto bg-white rounded-full flex items-center justify-center shadow-lg mb-4">
-                            <i class="fas fa-user text-indigo-600 text-5xl"></i>
-                        </div>
-                        <h2 class="text-xl font-bold text-white" id="profileFullName">{{ current_user.first_name }} {{ current_user.last_name }}</h2>
-                        <div class="inline-flex items-center gap-1 mt-2 px-3 py-1 bg-white/20 rounded-full text-white text-xs">
-                            <i class="fas fa-shield-alt"></i>
-                            <span id="profileRoleBadge">{{ current_user.role }} </span>
-                        </div>
-                    </div>
-
-                    <div class="p-5 space-y-3 border-t border-slate-100">
-                        <button id="editProfileBtn" class="action-btn w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-xl transition font-medium" popovertarget="editProfileModal">
-                            <i class="fas fa-pen"></i>
-                            Редактировать профиль
-                        </button>
-                        <button id="changePasswordBtn" class="action-btn w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-xl transition font-medium">
-                            <i class="fas fa-key"></i>
-                            Изменить пароль
-                        </button>
-                        <button id="logoutAllDevicesBtn" class="action-btn w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-700 rounded-xl transition font-medium">
-                            <i class="fas fa-sign-out-alt"></i>
-                            Выйти со всех устройств
-                        </button>
-                    </div>
+        <!-- Правая колонка - информация о пользователе -->
+        <div class="lg:col-span-2 space-y-6">
+            <div class="bg-white rounded-2xl shadow-lg border border-slate-100 overflow-hidden">
+                <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+                    <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fas fa-info-circle text-indigo-500"></i>
+                        Личная информация
+                    </h3>
                 </div>
-            </div>
-
-            <!-- Правая колонка - информация о пользователе -->
-            <div class="lg:col-span-2 space-y-6">
-                <div class="bg-white rounded-2xl shadow-lg border border-slate-100 overflow-hidden">
-                    <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50">
-                        <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-                            <i class="fas fa-info-circle text-indigo-500"></i>
-                            Личная информация
-                        </h3>
+                <div class="divide-y divide-slate-100">
+                    <div class="info-row flex flex-col sm:flex-row sm:items-center p-5 gap-3">
+                        <div class="sm:w-32 flex items-center gap-2">
+                            <i class="fas fa-user text-indigo-400 w-5"></i>
+                            <span class="text-sm font-medium text-slate-500">Имя</span>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-slate-800 font-medium" id="displayFirstName">{{ current_user.first_name
+                                }}</p>
+                        </div>
                     </div>
-                    <div class="divide-y divide-slate-100">
-                        <div class="info-row flex flex-col sm:flex-row sm:items-center p-5 gap-3">
-                            <div class="sm:w-32 flex items-center gap-2">
-                                <i class="fas fa-user text-indigo-400 w-5"></i>
-                                <span class="text-sm font-medium text-slate-500">Имя</span>
-                            </div>
-                            <div class="flex-1">
-                                <p class="text-slate-800 font-medium" id="displayFirstName">{{ current_user.first_name }}</p>
-                            </div>
+                    <div class="info-row flex flex-col sm:flex-row sm:items-center p-5 gap-3">
+                        <div class="sm:w-32 flex items-center gap-2">
+                            <i class="fas fa-user-tag text-indigo-400 w-5"></i>
+                            <span class="text-sm font-medium text-slate-500">Фамилия</span>
                         </div>
-                        <div class="info-row flex flex-col sm:flex-row sm:items-center p-5 gap-3">
-                            <div class="sm:w-32 flex items-center gap-2">
-                                <i class="fas fa-user-tag text-indigo-400 w-5"></i>
-                                <span class="text-sm font-medium text-slate-500">Фамилия</span>
-                            </div>
-                            <div class="flex-1">
-                                <p class="text-slate-800 font-medium" id="displayLastName">{{ current_user.last_name }}</p>
-                            </div>
+                        <div class="flex-1">
+                            <p class="text-slate-800 font-medium" id="displayLastName">{{ current_user.last_name }}</p>
                         </div>
-                        <!-- Email -->
-                        <div class="info-row flex flex-col sm:flex-row sm:items-center p-5 gap-3">
-                            <div class="sm:w-32 flex items-center gap-2">
-                                <i class="fas fa-envelope text-indigo-400 w-5"></i>
-                                <span class="text-sm font-medium text-slate-500">Email</span>
-                            </div>
-                            <div class="flex-1">
-                                <p class="text-slate-800 font-medium" id="displayEmail">{{ current_user.email }}</p>
-<!--                                <p class="text-xs text-green-600 mt-0.5 flex items-center gap-1">-->
-<!--                                    <i class="fas fa-check-circle"></i> Подтвержден-->
-<!--                                </p>-->
-                            </div>
+                    </div>
+                    <!-- Email -->
+                    <div class="info-row flex flex-col sm:flex-row sm:items-center p-5 gap-3">
+                        <div class="sm:w-32 flex items-center gap-2">
+                            <i class="fas fa-envelope text-indigo-400 w-5"></i>
+                            <span class="text-sm font-medium text-slate-500">Email</span>
                         </div>
-                        <!-- Телефон -->
-                        <div class="info-row flex flex-col sm:flex-row sm:items-center p-5 gap-3">
-                            <div class="sm:w-32 flex items-center gap-2">
-                                <i class="fas fa-phone-alt text-indigo-400 w-5"></i>
-                                <span class="text-sm font-medium text-slate-500">Телефон</span>
-                            </div>
-                            <div class="flex-1">
-                                <p class="text-slate-800 font-medium" id="displayPhone">{{ current_user.phone_number }}</p>
-                            </div>
+                        <div class="flex-1">
+                            <p class="text-slate-800 font-medium" id="displayEmail">{{ current_user.email }}</p>
+                            {% if current_user.verified_email %}
+                            <p class="text-xs text-green-600 mt-0.5 flex items-center gap-1">
+                                <i class="fas fa-check-circle"></i> Подтвержден
+                            </p>
+                            {% endif %}
                         </div>
-                        <!-- Роль -->
-                        <div class="info-row flex flex-col sm:flex-row sm:items-center p-5 gap-3">
-                            <div class="sm:w-32 flex items-center gap-2">
-                                <i class="fas fa-badge text-indigo-400 w-5"></i>
-                                <span class="text-sm font-medium text-slate-500">Роль</span>
-                            </div>
-                            <div class="flex-1">
-                                <div class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium" id="roleBadge">
-                                    <i class="fas fa-crown"></i>
-                                    <span id="displayRole">{{ current_user.role }}</span>
-                                </div>
+                    </div>
+                    <!-- Телефон -->
+                    <div class="info-row flex flex-col sm:flex-row sm:items-center p-5 gap-3">
+                        <div class="sm:w-32 flex items-center gap-2">
+                            <i class="fas fa-phone-alt text-indigo-400 w-5"></i>
+                            <span class="text-sm font-medium text-slate-500">Телефон</span>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-slate-800 font-medium" id="displayPhone">{{ current_user.phone_number }}</p>
+                        </div>
+                    </div>
+                    <!-- Роль -->
+                    <div class="info-row flex flex-col sm:flex-row sm:items-center p-5 gap-3">
+                        <div class="sm:w-32 flex items-center gap-2">
+                            <i class="fas fa-badge text-indigo-400 w-5"></i>
+                            <span class="text-sm font-medium text-slate-500">Роль</span>
+                        </div>
+                        <div class="flex-1">
+                            <div class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium"
+                                 id="roleBadge">
+                                <i class="fas fa-crown"></i>
+                                <span id="displayRole">{{ current_user.role.value }}</span>
                             </div>
                         </div>
                     </div>
@@ -117,4 +133,5 @@
             </div>
         </div>
     </div>
+</div>
 {% endblock %}

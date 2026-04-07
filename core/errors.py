@@ -42,6 +42,12 @@ class UnauthorizedError(BaseError):
         self.message = message or self.message
 
 
+class EmailAlreadyVerifiedError(BaseError):
+    code = status.HTTP_409_CONFLICT
+    message = "Email уже подтвержден!"
+    redirect_to = "auth.profile"
+
+
 
 class InvalidCredentialsError(BaseError):
     code = status.HTTP_401_UNAUTHORIZED

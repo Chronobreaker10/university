@@ -20,16 +20,16 @@ templates = Jinja2Templates(directory="templates")
 def get_majors(request: Request, data: Annotated[MajorResponse, Depends(get_all_majors)],
                current_user: Annotated[UserRead, Depends(get_current_user)]):
     message = request.session.pop("flashed_message", "")
-    return templates.TemplateResponse("majors/index.html",
-                                      {"request": request, "response": data, "title": "Специальности",
-                                       "current_user": current_user, "message": message})
+    return templates.TemplateResponse(request=request, name="majors/index.html",
+                                      context={"response": data, "title": "Специальности",
+                                               "current_user": current_user, "message": message})
 
 
 @router.get("/create", name="majors.create")
 def create_major(request: Request, current_user: Annotated[UserRead, Depends(get_current_user)]):
-    return templates.TemplateResponse("majors/create.html",
-                                      {"request": request, "title": "Добавить специальность",
-                                       "current_user": current_user})
+    return templates.TemplateResponse(request=request, name="majors/create.html",
+                                      context={"title": "Добавить специальность",
+                                               "current_user": current_user})
 
 
 @router.post("/", name="majors.post")

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+__all__ = ("exception_handlers",)
+
 import pathlib
 import time
 from contextlib import asynccontextmanager
@@ -8,25 +10,26 @@ from random import randint
 from typing import Annotated, AsyncGenerator
 
 import uvicorn
-from fastapi import FastAPI, Query, Path, HTTPException, Request, Depends, status
-from fastapi.responses import ORJSONResponse, JSONResponse
+from fastapi import FastAPI, Query, Path, HTTPException, Request, Depends
+from fastapi.responses import ORJSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
 from fastapi_csrf_protect import CsrfProtect
 from redis.asyncio import Redis
-import api.services.auth as auth_service
 from starlette.middleware.sessions import SessionMiddleware
 
 import api.crud.students as student_crud
+import api.services.auth as auth_service
 from api.views import router as api_router
+from core.broker import broker
 from core.config import settings
 from core.database import db_helper
-from core.errors import UnauthorizedError
-from core.logger import access_logger, app_errors_logger
+from core.logger import access_logger
 from core.schemas import StudentRead, StudentUpdate, StudentFilterByID, StudentFilterParams
 from pages import router as page_router
 from utils import json_to_dict_list
+from utils.send_email import send_verify_email
 
 parent_dir = pathlib.Path(__file__).parent
 data_dir = parent_dir / 'students.json'
@@ -36,9 +39,11 @@ data_dir = parent_dir / 'students.json'
 async def lifespan(current_app: FastAPI) -> AsyncGenerator[None, None]:
     redis = Redis(host=settings.redis.host, port=settings.redis.port, db=settings.cache.db_name)
     FastAPICache.init(RedisBackend(redis), prefix=settings.cache.prefix)
+    await broker.start()
     yield
     await db_helper.dispose()
     await redis.close()
+    await broker.stop()
 
 
 async def clear_session(request: Request):
@@ -168,8 +173,7 @@ async def delete_student(student_filter: StudentFilterByID):
         raise HTTPException(status_code=400, detail="Ошибка при удалении студента")
 
 
-import pages.exception_handlers
-
+from pages import exception_handlers
 
 if __name__ == '__main__':
-    uvicorn.run(app, host=settings.run.host, port=settings.run.port, reload=True)
+    uvicorn.run(app, host=settings.run.host, port=settings.run.port)

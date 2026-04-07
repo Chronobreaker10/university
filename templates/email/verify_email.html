@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Подтверждение email | Учебный центр</title>
+    <link rel="stylesheet" type="text/css" href="/static/email.css">
+</head>
+<body style="margin: 0; padding: 20px 12px; background-color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, Helvetica, Arial, sans-serif;">
+    <div class="email-container" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 24px; overflow: hidden; box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.1);">
+        <div class="header-gradient" style="background: linear-gradient(135deg, #4f46e5 0%, #6366f1 50%, #818cf8 100%); padding: 32px 24px; text-align: center;">
+            <div class="logo-circle" style="background-color: rgba(255, 255, 255, 0.2); width: 64px; height: 64px; border-radius: 32px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15h-2v-2h2v2zm0-4h-2V7h2v6z" fill="white"/>
+                </svg>
+            </div>
+            <h1 style="color: #ffffff; font-size: 28px; font-weight: 700; margin: 0 0 8px 0;">Учебный Центр</h1>
+            <p style="color: rgba(255, 255, 255, 0.9); font-size: 16px; margin: 0;">Подтверждение электронной почты</p>
+        </div>
+
+        <!-- Основное содержание -->
+        <div class="content" style="padding: 32px 28px;">
+            <!-- Приветствие -->
+            <div style="margin-bottom: 24px;">
+                <p style="font-size: 18px; font-weight: 600; color: #1e293b; margin: 0 0 8px 0;">Здравствуйте, <span style="color: #4f46e5;">{{ user.first_name }} {{ user.last_name }}</span>!</p>
+                <div class="divider" style="height: 1px; background-color: #e2e8f0; margin: 16px 0 20px 0;"></div>
+                <p style="color: #475569; font-size: 15px; line-height: 1.6; margin: 0 0 16px 0;">
+                    Благодарим вас за регистрацию в системе управления учебным центром.
+                    Для завершения создания аккаунта и получения доступа ко всем возможностям платформы,
+                    пожалуйста, подтвердите ваш электронный адрес.
+                </p>
+            </div>
+
+            <!-- Информация об email -->
+            <div style="background-color: #f1f5f9; border-radius: 16px; padding: 20px; margin-bottom: 28px; border-left: 4px solid #4f46e5;">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" fill="#4f46e5"/>
+                    </svg>
+                    <span style="font-size: 13px; color: #64748b; font-weight: 500;">Email для подтверждения</span>
+                </div>
+                <p style="font-size: 18px; font-weight: 600; color: #1e293b; margin: 0; word-break: break-all;">
+                    {{ user.email }}
+                </p>
+                <p style="font-size: 12px; color: #94a3b8; margin: 8px 0 0 0;">
+                    Если вы не регистрировались на нашем сайте, просто проигнорируйте это письмо.
+                </p>
+            </div>
+
+            <div style="text-align: center; margin-bottom: 28px;">
+                <a href="{{ verification_link }}" class="btn" style="display: inline-block; background-color: #4f46e5; color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 40px; font-weight: 600; font-size: 16px; text-align: center; box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3);">
+                    Подтвердить email
+                </a>
+            </div>
+
+            <div style="background-color: #fefce8; border-radius: 12px; padding: 16px; margin-bottom: 24px; border: 1px solid #fef08a;">
+                <p style="font-size: 13px; color: #854d0e; margin: 0 0 8px 0; display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 16px;">🔗</span>
+                    <span style="font-weight: 600;">Если кнопка не работает, скопируйте ссылку в браузер:</span>
+                </p>
+                <p style="font-size: 12px; color: #a16207; word-break: break-all; background-color: #ffffff; padding: 10px; border-radius: 8px; margin: 0; font-family: monospace;">
+                    {{ verification_link }}
+                </p>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 12px; background-color: #eff6ff; border-radius: 12px; padding: 14px 16px; margin-bottom: 8px;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" fill="#3b82f6"/>
+                </svg>
+                <div>
+                    <p style="font-size: 13px; font-weight: 600; color: #1e40af; margin: 0 0 4px 0;">Ссылка действительна 15 минут</p>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="footer" style="background-color: #f8fafc; padding: 24px; text-align: center; border-top: 1px solid #e2e8f0;">
+            <p style="font-size: 12px; color: #94a3b8; margin: 0 0 8px 0;">
+                © 2024 Учебный Центр. Все права защищены.
+            </p>
+            <p style="font-size: 12px; color: #94a3b8; margin: 0;">
+                Это автоматическое сообщение, пожалуйста, не отвечайте на него.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

@@ -25,6 +25,7 @@ class User(Base):
     email: Mapped[str_uniq]
     hashed_password: Mapped[str] = mapped_column(String(100))
     role: Mapped[Role] = mapped_column(default=Role.USER, server_default=text("'USER'"))
+    verified_email: Mapped[bool] = mapped_column(server_default=text("false"), default=False)
 
     def __repr__(self):
         return f"{self.__class__.__name__}(id={self.id}first_name={self.email}"

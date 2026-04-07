@@ -21,17 +21,17 @@ templates = Jinja2Templates(directory="templates")
 def get_students(request: Request, data: Annotated[StudentResponse, Depends(get_all_students)],
                  current_user: Annotated[UserRead, Depends(get_current_user)]):
     message = request.session.pop("flashed_message", "")
-    return templates.TemplateResponse("students/index.html",
-                                      {"request": request, "response": data, "title": "Студенты",
-                                       "current_user": current_user, "message": message})
+    return templates.TemplateResponse(request=request, name="students/index.html",
+                                      context={"response": data, "title": "Студенты",
+                                               "current_user": current_user, "message": message})
 
 
 @router.get("/create", name="students.create")
 def create_student(request: Request, majors: Annotated[MajorResponse, Depends(get_all_majors)],
                    current_user: Annotated[UserRead, Depends(get_current_user)]):
     message = request.session.pop("flashed_message", "")
-    return templates.TemplateResponse("students/create.html",
-                                      {"request": request, "title": "Добавить студента", "majors": majors.majors,
+    return templates.TemplateResponse(request=request, name="students/create.html",
+                                      context={"title": "Добавить студента", "majors": majors.majors,
                                        "current_user": current_user, "message": message})
 
 

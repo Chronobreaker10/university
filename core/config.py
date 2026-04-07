@@ -1,13 +1,8 @@
 import logging
+from pathlib import Path
 from typing import Literal
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import BaseModel, PostgresDsn, RedisDsn
-from enum import Enum
-
-
-class Environment(str, Enum):
-    DEV = "dev"
-    PROD = "prod"
+from pydantic import BaseModel, PostgresDsn, AmqpDsn
 
 LOG_DEFAULT_FORMAT = (
     "[%(asctime)s.%(msecs)03d] %(module)10s:%(lineno)-3d %(levelname)-7s - %(message)s"
@@ -15,7 +10,7 @@ LOG_DEFAULT_FORMAT = (
 
 
 class RunConfig(BaseModel):
-    host: str = "0.0.0.0"
+    host: str = "localhost"
     port: int = 8000
 
 
@@ -70,8 +65,8 @@ class CsrfConfig(BaseModel):
 
 
 class RedisConfig(BaseModel):
-    host: str = "localhost"
-    port: int = 6378
+    host: str
+    port: int
     db: int = 1
     prefix: str = "university"
 
@@ -81,16 +76,30 @@ class CacheConfig(BaseModel):
     db_name: int = 0
 
 
+class FastStreamConfig(BaseModel):
+    rabbitmq_url: AmqpDsn
+
+
+class MailConfig(BaseModel):
+    smtp_host: str = "localhost"
+    smtp_port: int = 1025
+    smtp_email: str = "admin@university.ru"
+    smtp_password: str = ""
+    templates_path: Path = Path(__file__).parent.parent / "templates" / "email"
+
+
 class Settings(BaseSettings):
     db: DatabaseConfig
     security: SecurityConfig
     csrf: CsrfConfig
     cache: CacheConfig = CacheConfig()
-    redis: RedisConfig = RedisConfig()
+    redis: RedisConfig
     run: RunConfig = RunConfig()
     logging: LoggingConfig = LoggingConfig()
+    fast_stream: FastStreamConfig
+    mail: MailConfig = MailConfig()
     TEST_DATABASE_URL: str = "sqlite+aiosqlite://"
-    ENV: str = Environment.DEV
+    ENV: Literal["dev", "prod"] = "prod"
     model_config = SettingsConfigDict(
         env_file=(".env.template", ".env"),
         case_sensitive=False,
@@ -99,4 +108,3 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
-

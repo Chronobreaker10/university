@@ -1,12 +1,31 @@
 services:
   fastapi:
     build: .
+    container_name: university_app
     ports:
       - "8000:8000"
+    restart: always
     env_file:
       - .env.docker
     volumes:
       - .:/app
+    depends_on:
+      - postgres
+      - redis
+    command: ["fastapi", "run", "main.py", "--port", "8000"]
+
+  faststream:
+    container_name: university_worker
+    build: .
+    env_file:
+      - .env.docker
+    restart: always
+    volumes:
+      - .:/app
+    depends_on:
+      - postgres
+      - redis
+    command: ["faststream", "run", "subscriptions.app:app"]
 
   postgres:
     image: postgres:latest
@@ -48,6 +67,7 @@ services:
 
   maildev:
     image: maildev/maildev
+    container_name: university_mail
     environment:
       - TZ=Europe/Moscow
       - MAILDEV_WEB_PORT=1080
@@ -67,6 +87,21 @@ services:
       - "6378:6379"
     restart: unless-stopped
 
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    hostname: rabbitmq
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: "guest"
+      RABBITMQ_DEFAULT_PASS: "guest"
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+
+
 volumes:
   pgdata:
     driver: local
+  rabbitmq-data:
