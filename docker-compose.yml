@@ -2,8 +2,6 @@ services:
   fastapi:
     build: .
     container_name: university_app
-    ports:
-      - "8000:8000"
     restart: always
     env_file:
       - .env.docker
@@ -12,7 +10,9 @@ services:
     depends_on:
       - postgres
       - redis
-    command: ["fastapi", "run", "main.py", "--port", "8000"]
+    expose:
+      - 8000
+    command: ["fastapi", "run", "main.py", "--port", "8000", "--workers", "4", "--forwarded-allow-ips", "*"]
 
   faststream:
     container_name: university_worker
@@ -99,6 +99,18 @@ services:
       RABBITMQ_DEFAULT_PASS: "guest"
     volumes:
       - rabbitmq-data:/var/lib/rabbitmq
+
+  reverse-proxy:
+    image: nginx:stable-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./static:/usr/share/nginx/university_static
+      - ./certs:/certs
+    depends_on:
+      - fastapi
 
 
 volumes:

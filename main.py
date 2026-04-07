@@ -29,7 +29,6 @@ from core.logger import access_logger
 from core.schemas import StudentRead, StudentUpdate, StudentFilterByID, StudentFilterParams
 from pages import router as page_router
 from utils import json_to_dict_list
-from utils.send_email import send_verify_email
 
 parent_dir = pathlib.Path(__file__).parent
 data_dir = parent_dir / 'students.json'
@@ -65,7 +64,7 @@ app.mount("/pages", frontend)
 @app.middleware("http")
 async def log_request(request, call_next):
     start_time = time.time()
-    client_ip = request.client.host if request.client else "unknown"
+    client_ip = request.client.host
     response = await call_next(request)
     process_time = time.time() - start_time
     timestamp = datetime.now().strftime("%d/%b/%Y:%H:%M:%S +0300")
