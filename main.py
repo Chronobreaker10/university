@@ -84,14 +84,11 @@ async def auth_middleware(request: Request, call_next):
         refresh_token = request.cookies.get(settings.security.refresh_token_cookie_name)
         if refresh_token:
             refresh_token = request.cookies.get(settings.security.refresh_token_cookie_name)
-            try:
-                access_token, refresh_token = await auth_service.refresh_tokens(refresh_token)
-                response.set_cookie(settings.security.access_token_cookie_name, access_token, httponly=True,
-                                    expires=settings.security.access_token_expires_minutes * 60)
-                response.set_cookie(settings.security.refresh_token_cookie_name, refresh_token, httponly=True,
-                                    expires=settings.security.refresh_token_expires_days * 24 * 60 * 60)
-            except:
-                pass
+            access_token, refresh_token = await auth_service.refresh_tokens(refresh_token)
+            response.set_cookie(settings.security.access_token_cookie_name, access_token, httponly=True,
+                                expires=settings.security.access_token_expires_minutes * 60)
+            response.set_cookie(settings.security.refresh_token_cookie_name, refresh_token, httponly=True,
+                                expires=settings.security.refresh_token_expires_days * 24 * 60 * 60)
 
     return response
 
