@@ -3,9 +3,9 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, status, Path
 from fastapi import Response
 from sqlalchemy.ext.asyncio import AsyncSession
+from api.services.auth import AuthService
 
 import api.services.user as service
-import api.services.auth as auth_service
 from api.dependencies.user import get_current_user
 from core.config import settings
 from core.models import User
@@ -32,23 +32,22 @@ async def get_user_by_id(session: Annotated[AsyncSession, Depends(db_helper.get_
     return await service.get_user_by_id(session, user_id)
 
 
-@router.post("/register", summary="Зарегистрироваться", response_model=DefaultResponse,
-             status_code=status.HTTP_201_CREATED)
-async def register(session: Annotated[AsyncSession, Depends(db_helper.get_session())], user: UserCreate):
-    user_id = await auth_service.register_user(session, user)
+@router.post("/register", summary="Зарегистрироваться", status_code=status.HTTP_201_CREATED)
+async def register(user: UserCreate, auth_service: Annotated[AuthService, Depends()]) -> dict:
+    user_id = await auth_service.register_user(user)
     return {
         "message": f"Пользователь {user_id} успешно зарегистрирован"
     }
 
 
 @router.post("/login", summary="Войти", response_model=Token)
-async def login(session: Annotated[AsyncSession, Depends(db_helper.get_session())], response: Response,
+async def login(auth_service: Annotated[AuthService, Depends()], response: Response,
                 credentials: UserAuth):
-    access_token, refresh_token, user = await auth_service.login_user(session, credentials.email, credentials.password)
+    access_token, refresh_token, user = await auth_service.login_user(credentials.email, credentials.password)
     response.set_cookie(settings.security.access_token_cookie_name, access_token, httponly=True,
                         expires=settings.security.access_token_expires_minutes * 60)
     response.set_cookie(settings.security.refresh_token_cookie_name, refresh_token, httponly=True,
-                       expires=settings.security.refresh_token_expires_days * 24 * 60 * 60)
+                        expires=settings.security.refresh_token_expires_days * 24 * 60 * 60)
     return Token(token=access_token)
 
 

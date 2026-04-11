@@ -11,7 +11,7 @@ from fastapi_csrf_protect import CsrfProtect
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.dependencies.user import get_current_user
-from api.services.auth import login_user, register_user, logout_user, logout_all_devices
+from api.services.auth import AuthService
 import api.services.user as user_service
 from core.config import settings
 from core.database import db_helper
@@ -76,11 +76,11 @@ async def register_form(request: Request):
 @router.post("/login", name="auth.login")
 @check_cookie
 async def login(request: Request, credentials: Annotated[OAuth2PasswordRequestForm, Depends()],
-                session: Annotated[AsyncSession, Depends(db_helper.get_session())],
+                service: Annotated[AuthService, Depends()],
                 csrf_protect: Annotated[CsrfProtect, Depends()],
                 next_redirect: Annotated[str | None, Query(alias="next")] = None):
     await csrf_protect.validate_csrf(request)
-    access_token, refresh_token, user = await login_user(session, credentials.username, credentials.password)
+    access_token, refresh_token, user = await service.login_user(credentials.username, credentials.password)
     url = request.url_for("students.index")
     if next_redirect:
         url = next_redirect
@@ -99,10 +99,10 @@ async def login(request: Request, credentials: Annotated[OAuth2PasswordRequestFo
 @router.post("/register", name="auth.register")
 @check_cookie
 async def register(request: Request, data: Annotated[UserRegister, Form()],
-                   session: Annotated[AsyncSession, Depends(db_helper.get_session())]):
+                   service: Annotated[AuthService, Depends()]):
     user_data = UserCreate.model_validate(data.model_dump(exclude={"repeat_password"}))
-    await register_user(session, user_data)
-    access_token, refresh_token, user = await login_user(session, data.email, data.hashed_password)
+    await service.register_user(user_data)
+    access_token, refresh_token, user = await service.login_user(data.email, data.hashed_password)
     response = RedirectResponse(url=request.url_for("students.index"), status_code=status.HTTP_303_SEE_OTHER)
     response.set_cookie(settings.security.access_token_cookie_name, access_token, httponly=True,
                         expires=settings.security.access_token_expires_minutes * 60)
@@ -114,11 +114,12 @@ async def register(request: Request, data: Annotated[UserRegister, Form()],
 
 
 @router.post("/logout", name="auth.logout")
-async def logout(request: Request, current_user: Annotated[User, Depends(get_current_user)]):
+async def logout(request: Request, current_user: Annotated[User, Depends(get_current_user)],
+                 service: Annotated[AuthService, Depends()]):
     refresh_token = request.cookies.get(settings.security.refresh_token_cookie_name)
     if not refresh_token:
         raise UnauthorizedError
-    await logout_user(current_user, refresh_token)
+    await service.logout_user(current_user, refresh_token)
     response = RedirectResponse(url=request.url_for("auth.login_form"), status_code=status.HTTP_303_SEE_OTHER)
     response.delete_cookie(settings.security.access_token_cookie_name)
     response.delete_cookie(settings.security.refresh_token_cookie_name)
@@ -128,11 +129,12 @@ async def logout(request: Request, current_user: Annotated[User, Depends(get_cur
 
 
 @router.post("/logout_all", name="auth.logout_all")
-async def logout_all(request: Request, current_user: Annotated[User, Depends(get_current_user)]):
+async def logout_all(request: Request, current_user: Annotated[User, Depends(get_current_user)],
+                     service: Annotated[AuthService, Depends()]):
     refresh_token = request.cookies.get(settings.security.refresh_token_cookie_name)
     if not refresh_token:
         raise UnauthorizedError
-    await logout_all_devices(current_user, refresh_token)
+    await service.logout_all_devices(current_user, refresh_token)
     response = RedirectResponse(url=request.url_for("auth.login_form"), status_code=status.HTTP_303_SEE_OTHER)
     response.delete_cookie(settings.security.access_token_cookie_name)
     response.delete_cookie(settings.security.refresh_token_cookie_name)
@@ -145,7 +147,8 @@ async def logout_all(request: Request, current_user: Annotated[User, Depends(get
 @check_cookie
 async def register_form(request: Request):
     message = request.session.pop("flashed_message", "")
-    return templates.TemplateResponse(request=request, name="profile/change_password.html", context={"message": message})
+    return templates.TemplateResponse(request=request, name="profile/change_password.html",
+                                      context={"message": message})
 
 
 @router.get("/verify_email", name="auth.verify_email_request")

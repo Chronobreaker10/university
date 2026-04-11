@@ -10,8 +10,8 @@ from random import randint
 from typing import Annotated, AsyncGenerator
 
 import uvicorn
-from fastapi import FastAPI, Query, Path, HTTPException, Request, Depends
-from fastapi.responses import ORJSONResponse
+from fastapi import FastAPI, Query, Path, HTTPException, Request, Depends, status
+from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
@@ -20,12 +20,14 @@ from redis.asyncio import Redis
 from starlette.middleware.sessions import SessionMiddleware
 
 import api.crud.students as student_crud
-import api.services.auth as auth_service
+from api.services.auth import AuthService
 from api.views import router as api_router
 from core.broker import broker
 from core.config import settings
 from core.database import db_helper
+from core.errors import UnauthorizedError
 from core.logger import access_logger
+from core.redis import get_redis
 from core.schemas import StudentRead, StudentUpdate, StudentFilterByID, StudentFilterParams
 from pages import router as page_router
 from utils import json_to_dict_list
@@ -52,7 +54,7 @@ async def clear_session(request: Request):
 
 app = FastAPI(lifespan=lifespan)
 frontend = FastAPI(dependencies=[Depends(clear_session)])
-api = FastAPI(default_response_class=ORJSONResponse)
+api = FastAPI()
 api.include_router(api_router)
 frontend.include_router(page_router)
 app.add_middleware(SessionMiddleware, secret_key=settings.security.secret_key)
@@ -83,7 +85,11 @@ async def auth_middleware(request: Request, call_next):
         refresh_token = request.cookies.get(settings.security.refresh_token_cookie_name)
         if refresh_token:
             refresh_token = request.cookies.get(settings.security.refresh_token_cookie_name)
-            access_token, refresh_token = await auth_service.refresh_tokens(refresh_token)
+            auth_service = AuthService(redis=get_redis(), session=None)
+            try:
+                access_token, refresh_token = await auth_service.refresh_tokens(refresh_token)
+            except UnauthorizedError:
+                return response
             response.set_cookie(settings.security.access_token_cookie_name, access_token, httponly=True,
                                 expires=settings.security.access_token_expires_minutes * 60)
             response.set_cookie(settings.security.refresh_token_cookie_name, refresh_token, httponly=True,
