@@ -1,7 +1,6 @@
-import math
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, status, Query, Path, Request
+from fastapi import APIRouter, Depends, status, Query, Path
 from sqlalchemy.ext.asyncio import AsyncSession
 
 import api.services.major as service

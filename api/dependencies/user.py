@@ -1,9 +1,8 @@
 from typing import Annotated
 
-from fastapi import Request, Depends, Response
+from fastapi import Request, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-import api.services.auth as auth_service
 import api.services.user as service
 from core.config import settings
 from core.database import db_helper

@@ -2,25 +2,24 @@ from __future__ import annotations
 
 import hashlib
 import json
-
-from fastapi.encoders import jsonable_encoder
-from fastapi import Depends
-from pydantic import create_model
-from sqlalchemy.ext.asyncio import AsyncSession
+from datetime import datetime, timezone
 from typing import Annotated
-from redis.asyncio.client import Pipeline
 
+from fastapi import Depends
+from fastapi.encoders import jsonable_encoder
+from pydantic import create_model
+from redis.asyncio import Redis
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from core.broker import broker
 from core.config import settings
 from core.dao import UserDAO
+from core.database import db_helper
 from core.errors import UnauthorizedError, InvalidCredentialsError
 from core.models import User
 from core.redis import get_redis
-from redis.asyncio import Redis
 from core.schemas import UserCreate
 from core.security.auth import get_password_hash, verify_password, create_access_token, create_refresh_token
-from core.broker import broker
-from datetime import datetime, timezone
-from core.database import db_helper
 
 
 class AuthService:

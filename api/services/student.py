@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from core.dao import StudentDAO
 from core.errors import NotFoundError
 from core.models import Student
-from core.schemas import StudentFilter, StudentCreate, StudentResponse
+from core.schemas import StudentFilter, StudentCreate
 
 
 async def get_students_by_filter(session: AsyncSession, student_filter: StudentFilter) \

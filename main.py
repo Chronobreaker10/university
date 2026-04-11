@@ -10,8 +10,7 @@ from random import randint
 from typing import Annotated, AsyncGenerator
 
 import uvicorn
-from fastapi import FastAPI, Query, Path, HTTPException, Request, Depends, status
-from fastapi.responses import RedirectResponse
+from fastapi import FastAPI, Query, Path, HTTPException, Request, Depends
 from fastapi.staticfiles import StaticFiles
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
