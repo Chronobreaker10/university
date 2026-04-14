@@ -10,6 +10,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi_csrf_protect import CsrfProtect
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from api.dependencies.auth import AuthServiceDep
 from api.dependencies.user import get_current_user
 from api.services.auth import AuthService
 import api.services.user as user_service
@@ -76,7 +77,7 @@ async def register_form(request: Request):
 @router.post("/login", name="auth.login")
 @check_cookie
 async def login(request: Request, credentials: Annotated[OAuth2PasswordRequestForm, Depends()],
-                service: Annotated[AuthService, Depends()],
+                service: AuthServiceDep,
                 csrf_protect: Annotated[CsrfProtect, Depends()],
                 next_redirect: Annotated[str | None, Query(alias="next")] = None):
     await csrf_protect.validate_csrf(request)
@@ -98,8 +99,7 @@ async def login(request: Request, credentials: Annotated[OAuth2PasswordRequestFo
 
 @router.post("/register", name="auth.register")
 @check_cookie
-async def register(request: Request, data: Annotated[UserRegister, Form()],
-                   service: Annotated[AuthService, Depends()]):
+async def register(request: Request, data: Annotated[UserRegister, Form()], service: AuthServiceDep):
     user_data = UserCreate.model_validate(data.model_dump(exclude={"repeat_password"}))
     await service.register_user(user_data)
     access_token, refresh_token, user = await service.login_user(data.email, data.hashed_password)
@@ -114,8 +114,7 @@ async def register(request: Request, data: Annotated[UserRegister, Form()],
 
 
 @router.post("/logout", name="auth.logout")
-async def logout(request: Request, current_user: Annotated[User, Depends(get_current_user)],
-                 service: Annotated[AuthService, Depends()]):
+async def logout(request: Request, current_user: Annotated[User, Depends(get_current_user)], service: AuthServiceDep):
     refresh_token = request.cookies.get(settings.security.refresh_token_cookie_name)
     if not refresh_token:
         raise UnauthorizedError
@@ -130,11 +129,11 @@ async def logout(request: Request, current_user: Annotated[User, Depends(get_cur
 
 @router.post("/logout_all", name="auth.logout_all")
 async def logout_all(request: Request, current_user: Annotated[User, Depends(get_current_user)],
-                     service: Annotated[AuthService, Depends()]):
+                     service: AuthServiceDep):
     refresh_token = request.cookies.get(settings.security.refresh_token_cookie_name)
     if not refresh_token:
         raise UnauthorizedError
-    await service.logout_all_devices(current_user, refresh_token)
+    await service.logout_all_devices(current_user)
     response = RedirectResponse(url=request.url_for("auth.login_form"), status_code=status.HTTP_303_SEE_OTHER)
     response.delete_cookie(settings.security.access_token_cookie_name)
     response.delete_cookie(settings.security.refresh_token_cookie_name)

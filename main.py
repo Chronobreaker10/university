@@ -36,13 +36,13 @@ data_dir = parent_dir / 'students.json'
 
 
 @asynccontextmanager
-async def lifespan(current_app: FastAPI) -> AsyncGenerator[None, None]:
-    redis = Redis(host=settings.redis.host, port=settings.redis.port, db=settings.cache.db_name)
+async def lifespan(_: FastAPI) -> AsyncGenerator[None, None]:
+    redis = get_redis()
     FastAPICache.init(RedisBackend(redis), prefix=settings.cache.prefix)
     await broker.start()
     yield
     await db_helper.dispose()
-    await redis.close()
+    await redis.aclose()
     await broker.stop()
 
 

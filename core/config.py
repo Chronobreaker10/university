@@ -67,7 +67,7 @@ class CsrfConfig(BaseModel):
 class RedisConfig(BaseModel):
     host: str
     port: int
-    db: int = 1
+    db: int = 0
     prefix: str = "university"
 
 

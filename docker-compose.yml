@@ -86,6 +86,9 @@ services:
     ports:
       - "6378:6379"
     restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis-data:/data
 
   rabbitmq:
     image: rabbitmq:3-management-alpine
@@ -117,3 +120,4 @@ volumes:
   pgdata:
     driver: local
   rabbitmq-data:
+  redis-data:

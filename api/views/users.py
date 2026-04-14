@@ -3,14 +3,14 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, status, Path
 from fastapi import Response
 from sqlalchemy.ext.asyncio import AsyncSession
-from api.services.auth import AuthService
 
 import api.services.user as service
+from api.dependencies.auth import AuthServiceDep
 from api.dependencies.user import get_current_user
 from core.config import settings
+from core.database import db_helper
 from core.models import User
 from core.schemas import UserCreate, UserRead, UserAuth, Token, DefaultResponse
-from core.database import db_helper
 
 router = APIRouter(prefix='/users', tags=['Пользователи'])
 
@@ -33,7 +33,7 @@ async def get_user_by_id(session: Annotated[AsyncSession, Depends(db_helper.get_
 
 
 @router.post("/register", summary="Зарегистрироваться", status_code=status.HTTP_201_CREATED)
-async def register(user: UserCreate, auth_service: Annotated[AuthService, Depends()]) -> dict:
+async def register(user: UserCreate, auth_service: AuthServiceDep) -> dict:
     user_id = await auth_service.register_user(user)
     return {
         "message": f"Пользователь {user_id} успешно зарегистрирован"
@@ -41,7 +41,7 @@ async def register(user: UserCreate, auth_service: Annotated[AuthService, Depend
 
 
 @router.post("/login", summary="Войти", response_model=Token)
-async def login(auth_service: Annotated[AuthService, Depends()], response: Response,
+async def login(auth_service: AuthServiceDep, response: Response,
                 credentials: UserAuth):
     access_token, refresh_token, user = await auth_service.login_user(credentials.email, credentials.password)
     response.set_cookie(settings.security.access_token_cookie_name, access_token, httponly=True,

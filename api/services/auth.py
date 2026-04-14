@@ -3,9 +3,8 @@ from __future__ import annotations
 import hashlib
 import json
 from datetime import datetime, timezone
-from typing import Annotated
+from time import time
 
-from fastapi import Depends
 from fastapi.encoders import jsonable_encoder
 from pydantic import create_model
 from redis.asyncio import Redis
@@ -14,18 +13,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from core.broker import broker
 from core.config import settings
 from core.dao import UserDAO
-from core.database import db_helper
 from core.errors import UnauthorizedError, InvalidCredentialsError
 from core.models import User
-from core.redis import get_redis
 from core.schemas import UserCreate
 from core.security.auth import get_password_hash, verify_password, create_access_token, create_refresh_token
 
 
 class AuthService:
-    def __init__(self,
-                 session: Annotated[AsyncSession | None, Depends(db_helper.get_session())],
-                 redis: Annotated[Redis, Depends(get_redis)]):
+    def __init__(self, session: AsyncSession | None, redis: Redis):
         self.session = session
         self.redis = redis
 
@@ -47,12 +42,12 @@ class AuthService:
         if not user_id or user_id != user.id:
             raise UnauthorizedError
         async with self.redis.pipeline(transaction=True) as pipe:
-            res = await pipe.delete(key).srem(set_key, refresh_token_hash).execute()
+            res = await pipe.delete(key).zrem(set_key, refresh_token_hash).execute()
         if not res:
             raise UnauthorizedError
         return True
 
-    async def logout_all_devices(self, user: User, token: str) -> bool:
+    async def logout_all_devices(self, user: User) -> bool:
         # logout_result = await self.logout_user(user, token)
         # if not logout_result:
         #     return False
@@ -62,11 +57,13 @@ class AuthService:
         #         pipe.delete(key)
         #     result = await pipe.execute()
         set_key = f"{settings.redis.prefix}:user:{user.id}:refresh_tokens"
-        token_hashes = await self.redis.smembers(set_key)
-        keys_to_delete = [f"{settings.redis.prefix}:{settings.security.refresh_token_key}:{token_hash}" for token_hash
+        token_hashes = await self.redis.zrange(set_key, 0, -1)
+        keys_to_delete = [f"{settings.redis.prefix}:{settings.security.refresh_token_key}:{token_hash.decode()}" for
+                          token_hash
                           in token_hashes]
         keys_to_delete.append(set_key)
-        result = await self.redis.delete(*keys_to_delete)
+        async with self.redis.pipeline(transaction=True) as pipe:
+            result, _ = await pipe.delete(*keys_to_delete).delete(set_key).execute()
         if result:
             return True
         return False
@@ -83,13 +80,21 @@ class AuthService:
         access_token = create_access_token(data={"sub": str(user_id)})
         refresh_token = create_refresh_token()
         refresh_token_hash = hashlib.sha256((refresh_token + settings.security.secret_key).encode()).hexdigest()
+        current_ms = int(time())
+
         # key = f"{settings.redis.prefix}:{settings.security.refresh_token_key}:{user_id}:{refresh_token_hash}"
         key = f"{settings.redis.prefix}:{settings.security.refresh_token_key}:{refresh_token_hash}"
         set_key = f"{settings.redis.prefix}:user:{user_id}:refresh_tokens"
         user_data = json.dumps(jsonable_encoder({"user_id": user_id, "created": datetime.now(timezone.utc)}))
+        expire = settings.security.refresh_token_expires_days * 24 * 60 * 60
         async with self.redis.pipeline(transaction=True) as pipe:
-            await pipe.set(key, user_data, ex=(settings.security.refresh_token_expires_days * 24 * 60 * 60)).sadd(
-                set_key, refresh_token_hash).execute()
+            await (
+                pipe.zremrangebyscore(set_key, 0, current_ms - expire)
+                .set(key, user_data, ex=expire)
+                .zadd(set_key, {refresh_token_hash: current_ms})
+                .expire(set_key, expire)
+                .execute()
+            )
         return access_token, refresh_token
 
     async def refresh_tokens(self, token: str):
@@ -110,7 +115,7 @@ class AuthService:
             raise UnauthorizedError
         set_key = f"{settings.redis.prefix}:user:{user_id}:refresh_tokens"
         async with self.redis.pipeline(transaction=True) as pipe:
-            res = await pipe.delete(key).srem(set_key, refresh_token_hash).execute()
+            res = await pipe.delete(key).zrem(set_key, refresh_token_hash).execute()
         if res:
             access_token, refresh_token = await self.generate_tokens(user_id)
         else:
